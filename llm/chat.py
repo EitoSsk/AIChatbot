@@ -9,10 +9,11 @@ import torch
 class Chat:
 
     # コンストラクタ
-    def __init__(self, model, tokenizer):
+    def __init__(self, model, tokenizer, config):
         self.chat_history = []
         self.model = model
         self.tokenizer = tokenizer
+        self.config = config
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
@@ -43,8 +44,9 @@ class Chat:
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=256,
-                temperature=0.7,
+                max_new_tokens=self.config.chat_max_tokens,
+                temperature=self.config.chat_temperature,
+                top_p=self.config.chat_top_p,
             )
 
         # 応答をデコード
