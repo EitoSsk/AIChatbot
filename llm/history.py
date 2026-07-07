@@ -6,6 +6,20 @@
 # 履歴の保存は、チャットの応答が生成された後に行われる
 # 履歴の破棄は、最大トークン数を超えた場合に行われ、古いメッセージから順に削除される
 # history.jsonが存在しない場合は、新規作成される
+# history.jsonの内容は、ユーザーとアシスタントのメッセージのリストであり、各メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
+# history.jsonの内容は、以下のような形式で保存される
+# [
+#     {
+#         "role": "user",
+#         "content": "こんにちは、元気ですか？",
+#         "timestamp": "2023-01-01 00:00:00"
+#     },
+#     {
+#         "role": "assistant",
+#         "content": "元気です、ありがとう。あなたは？",
+#         "timestamp": "2023-01-01 00:00:01"
+#     }
+# ]
 
 import os
 import json
@@ -18,20 +32,28 @@ class History:
 
     # 履歴をロードするメソッド
     # history.jsonが存在しない場合は、新規作成される
+    # メッセージの取得前に_discard_history()を呼び出して履歴を整理する
+    # message_max_tokensの数だけ、直近のメッセージを取得する
     def load_history(self):
         if not os.path.exists(self.history_file):
             with open(self.history_file, 'w', encoding='utf-8') as f:
                 json.dump([], f, ensure_ascii=False, indent=4)
             return []
+        
+        self._discard_history()
 
         with open(self.history_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            history = json.load(f)
+            return history[-self.config.message_max_tokens:] if self.config.message_max_tokens else history
 
     # 履歴にメッセージを追加するメソッド
     # メッセージは辞書形式で、'role'と'content'のキーを持つ
+    # message_max_tokensの数だけ、直近のメッセージを保持する
+    # message_max_tokensの数を超えた場合は、古いメッセージから削除される
     def add_message(self, role, content):
         self.history.append({'role': role, 'content': content})
-        self._trim_history()
+        while self.config.message_max_tokens and len(self.history) > self.config.message_max_tokens:
+            self.history.pop(0)
         self._save_history()
 
     # 履歴を保存するメソッド
@@ -39,7 +61,15 @@ class History:
         with open(self.history_file, 'w', encoding='utf-8') as f:
             json.dump(self.history, f, ensure_ascii=False, indent=4)
 
-    # 履歴の最大数を超えた場合に古いメッセージから削除するメソッド
-    def _trim_history(self):
-        while len(self.history) > self.config.history_max_tokens:
-            self.history.pop(0)
+    # 履歴を破棄するメソッド
+    # history_max_tokensの数を超えた場合に、古いメッセージから削除される
+    def _discard_history(self):
+        # jsonファイルをロードして、メッセージの件数を確認する
+        with open(self.history_file, 'r', encoding='utf-8') as f:
+            history = json.load(f)
+        # history_max_tokensの数を超えた場合に、古いメッセージから削除される
+        while self.config.history_max_tokens and len(history) > self.config.history_max_tokens:
+            history.pop(0)
+        # 更新された履歴を保存する
+        with open(self.history_file, 'w', encoding='utf-8') as f:
+            json.dump(history, f, ensure_ascii=False, indent=4)
