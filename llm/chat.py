@@ -5,25 +5,26 @@
 #応答返却
 
 import torch
+from llm.history import History
 
 class Chat:
 
     # コンストラクタ
     def __init__(self, model, tokenizer, config):
-        self.chat_history = []
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
+        self.history = History(config)
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
     def send_message(self, message):
         # メッセージをチャット履歴に追加
-        self.chat_history.append({"role": "user", "content": message})
+        self.history.add_message("user", message)
         # 応答を生成
-        response = self.generate_response(self.chat_history)
+        response = self.generate_response(self.history.history)
         # 応答をチャット履歴に追加
-        self.chat_history.append({"role": "assistant", "content": response})
+        self.history.add_message("assistant", response)
         return response
 
     # インプットから応答を生成するメソッド
@@ -56,8 +57,4 @@ class Chat:
         )
 
         return response
-
-    # TODO: history.pyからチャット履歴を取得するメソッドを追加する
-    def get_chat_history(self):
-        return self.chat_history
     
