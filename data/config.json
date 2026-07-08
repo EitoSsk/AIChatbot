@@ -5,6 +5,6 @@
     "chat_max_tokens": 256,
     "chat_temperature": 0.7,
     "chat_top_p": 0.9,
-    "message_max_tokens": 20,
+    "message_max_tokens": 30,
     "history_max_tokens": 99999
 }

@@ -21,6 +21,7 @@
 #     }
 # ]
 
+from datetime import datetime
 import os
 import json
 
@@ -47,11 +48,11 @@ class History:
             return history[-self.config.message_max_tokens:] if self.config.message_max_tokens else history
 
     # 履歴にメッセージを追加するメソッド
-    # メッセージは辞書形式で、'role'と'content'のキーを持つ
+    # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
     # message_max_tokensの数だけ、直近のメッセージを保持する
     # message_max_tokensの数を超えた場合は、古いメッセージから削除される
     def add_message(self, role, content):
-        self.history.append({'role': role, 'content': content})
+        self.history.append({'role': role, 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
         while self.config.message_max_tokens and len(self.history) > self.config.message_max_tokens:
             self.history.pop(0)
         self._save_history()
