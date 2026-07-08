@@ -7,6 +7,8 @@
 import json
 import os
 
+from exception.file_exception import ConfigError, FileErrorType
+
 class Config:
     
     def __init__(self, config_file='./data/config.json'):
@@ -23,10 +25,12 @@ class Config:
         self.message_max_tokens = config_data.get("message_max_tokens", 30)
 
     def _load_config(self, config_file):
-        if not os.path.exists(config_file):
-            raise FileNotFoundError(f"Config file '{config_file}' not found.")
+        try: 
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            return config_data
+        except FileNotFoundError as e:
+            raise ConfigError(FileErrorType.READ)
+        except PermissionError as e:
+            raise ConfigError(FileErrorType.READ)
         
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
-        
-        return config_data

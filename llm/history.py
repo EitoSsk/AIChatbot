@@ -25,6 +25,8 @@ from datetime import datetime
 import os
 import json
 
+from exception.file_exception import FileErrorType, HistoryError
+
 class History:
     def __init__(self, config):
         self.config = config
@@ -41,11 +43,17 @@ class History:
                 json.dump([], f, ensure_ascii=False, indent=4)
             return []
         
-        self._discard_history()
+        try:
+            self._discard_history()
+            with open(self.history_file, 'r', encoding='utf-8') as f:
+                history = json.load(f)
+                return history[-self.config.message_max_tokens:] if self.config.message_max_tokens else history
+        except FileNotFoundError as e:
+            raise HistoryError(FileErrorType.READ)
+        except PermissionError as e:
+            raise HistoryError(FileErrorType.READ)
 
-        with open(self.history_file, 'r', encoding='utf-8') as f:
-            history = json.load(f)
-            return history[-self.config.message_max_tokens:] if self.config.message_max_tokens else history
+        
 
     # 履歴にメッセージを追加するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
@@ -55,7 +63,13 @@ class History:
         self.history.append({'role': role, 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
         while self.config.message_max_tokens and len(self.history) > self.config.message_max_tokens:
             self.history.pop(0)
-        self._save_history()
+
+        try:
+            self._save_history()
+        except FileNotFoundError as e:
+            raise HistoryError(FileErrorType.SAVE)
+        except PermissionError as e:
+            raise HistoryError(FileErrorType.SAVE)
 
     # 履歴を保存するメソッド
     def _save_history(self):
