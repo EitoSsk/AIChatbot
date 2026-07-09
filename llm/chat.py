@@ -15,22 +15,24 @@ class Chat:
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
-        self.history = History(config)
+        self.history = History(config, tokenizer)
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
     def send_message(self, message):
         # PromptBuilderを使用して、履歴からプロンプトを構築
-        prompt_builder = PromptBuilder(self.config)
-        prompt = prompt_builder.build_prompt(self.history.history, message)
+        prompt_builder = PromptBuilder(self.config, self.tokenizer)
+        trimed_history = prompt_builder.trim_history_by_tokens(self.history.history, message)
+        prompt = prompt_builder.build_prompt(trimed_history, message)
 
-        # メッセージをチャット履歴に追加（システムプロンプトは含めない）
-        self.history.add_message("user", message)
+        # 履歴の更新（システムプロンプトは含めない）
+        self.history.fetch_history("user", message, trimed_history)
 
         # 応答を生成
         response = self.generate_response(prompt)
         # 応答をチャット履歴に追加
-        self.history.add_message("assistant", response)
+        self.history.fetch_history("assistant", response, self.history.history)
+        print(self.history.history)
         return response
 
     # インプットから応答を生成するメソッド

@@ -43,21 +43,54 @@ class PromptBuilder:
 [ユーザー]
     """
 
-    def __init__(self, config):
+    def __init__(self, config, tokenizer):
         self.config = config
-        self._prompt = []
+        self.tokenizer = tokenizer
 
     def build_prompt(self, history, user_message):
-        # _promptに履歴を追加
+        # promptに履歴を追加
+        prompt = []
         for message in history:
-            self._prompt.append(message)
+            prompt.append(message)
     
         # システムプロンプトを構築
-        self._build_system_prompt(user_message)
-        
-        return self._prompt
+        prompt = self._build_system_prompt(prompt, user_message)
+        return prompt
 
-    def _build_system_prompt(self, user_message):
+    def _build_system_prompt(self, prompt, user_message):
         # システムプロンプトの構築ロジックをここに実装
         message = f"{self.SYSTEM_PROMPT}\n{user_message}"
-        self._prompt.append({'role': 'user', 'content': message, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        prompt.append({'role': 'user', 'content': message, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        return prompt
+
+    # 履歴とシステムプロンプトの合計からトークン数を計算し、
+    # 上限のトークン数に収めるため、履歴の数を調整して返却する
+    # 履歴の読み込み時はユーザーメッセージ不要
+    def trim_history_by_tokens(self, history, message=""):
+        trimed_history = history.copy()
+        # プロンプトを作成する
+        if not message == "":
+            prompt = self.build_prompt(history, message)
+        else:
+            prompt = history
+
+        if len(prompt) == 0: return []
+
+        while True:
+            if len(prompt) < 2: break
+
+            # トークナイズ
+            tokens = self.tokenizer.apply_chat_template(
+                prompt,
+                tokenize=True,
+                return_tensors="pt",
+                add_generation_prompt=True,
+            )
+            # message_max_tokensの上限を超えなくなるまで履歴を破棄する
+            if tokens["input_ids"].shape[-1] > self.config.message_max_tokens:
+                del prompt[:2]
+                del trimed_history[:2]
+            else:
+                break
+
+        return trimed_history
