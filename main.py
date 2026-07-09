@@ -4,16 +4,12 @@ from exception.file_exception import ConfigError, HistoryError, PromptError
 from llm.model import Model
 
 if __name__ == "__main__":
-    message = ""
+    e = None
     try: 
         model = Model()
         model.start_chat()
-    except HistoryError as e:
-        message = e
-    except ConfigError as e:
-        message = e
-    except PromptError as e:
-        message = e
+    except (HistoryError, ConfigError, PromptError) as error:
+        e = error
 
-    if (not message.strip()):
-        print(message)
+    if (not e == None):
+        print(e)

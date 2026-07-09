@@ -48,12 +48,8 @@ class History:
             with open(self.history_file, 'r', encoding='utf-8') as f:
                 history = json.load(f)
                 return history[-self.config.message_max_tokens:] if self.config.message_max_tokens else history
-        except FileNotFoundError as e:
-            raise HistoryError(FileErrorType.READ)
-        except PermissionError as e:
-            raise HistoryError(FileErrorType.READ)
-
-        
+        except (FileNotFoundError, PermissionError) as e:
+            raise HistoryError(FileErrorType.READ.value)
 
     # 履歴にメッセージを追加するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
@@ -66,10 +62,8 @@ class History:
 
         try:
             self._save_history()
-        except FileNotFoundError as e:
-            raise HistoryError(FileErrorType.SAVE)
-        except PermissionError as e:
-            raise HistoryError(FileErrorType.SAVE)
+        except (FileNotFoundError, PermissionError) as e:
+            raise HistoryError(FileErrorType.SAVE.value)
 
     # 履歴を保存するメソッド
     def _save_history(self):

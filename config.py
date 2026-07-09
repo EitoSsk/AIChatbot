@@ -29,8 +29,6 @@ class Config:
             with open(config_file, 'r', encoding='utf-8') as f:
                 config_data = json.load(f)
             return config_data
-        except FileNotFoundError as e:
-            raise ConfigError(FileErrorType.READ)
-        except PermissionError as e:
-            raise ConfigError(FileErrorType.READ)
+        except (FileNotFoundError, PermissionError) as e:
+            raise ConfigError(FileErrorType.READ.value)
         
