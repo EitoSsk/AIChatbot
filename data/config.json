@@ -1,4 +1,5 @@
 {
+    "debug_level": "info",
     "model_id": "google/gemma-3-1B-it",
     "user_name": "ユーザー",
     "assistant_name": "アシスタント",

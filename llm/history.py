@@ -28,10 +28,11 @@ from exception.file_exception import FileErrorType, HistoryError
 from llm.prompt import PromptBuilder
 
 class History:
-    def __init__(self, config, tokenizer):
+    def __init__(self, config, tokenizer, logger):
         self.config = config
         self.history_file = './data/history.json'
         self.tokenizer = tokenizer
+        self.logger = logger
         self._all_history = []
         self.history = self.load_history()
 
@@ -52,7 +53,7 @@ class History:
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.READ.value)
         
-        prompt_builder = PromptBuilder(self.config, self.tokenizer)
+        prompt_builder = PromptBuilder(self.config, self.tokenizer, self.logger)
         return prompt_builder.trim_history_by_tokens(self._all_history.copy())
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
@@ -67,6 +68,15 @@ class History:
             self._save_history()
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.SAVE.value)
+        
+        self.logger.debug(
+f"""
+[History]
+Historys: {len(self.history)}
+Total Historys: {len(self._all_history)}
+History Name: {self.history_file}
+"""
+        )
 
     # 履歴を保存するメソッド
     def _save_history(self):

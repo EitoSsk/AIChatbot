@@ -15,6 +15,7 @@ class Config:
         config_data = self._load_config(config_file)
 
         # キーから値を取得し、存在しない場合はデフォルト値を設定
+        self.debug_level = config_data.get("debug_level", "debug")
         self.model_id = config_data.get("model_id", "google/gemma-3-1B-it")
         self.user_name = config_data.get("user_name", "ユーザー")
         self.assistant_name = config_data.get("assistant_name", "アシスタント")

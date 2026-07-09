@@ -43,9 +43,10 @@ class PromptBuilder:
 [ユーザー]
     """
 
-    def __init__(self, config, tokenizer):
+    def __init__(self, config, tokenizer, logger):
         self.config = config
         self.tokenizer = tokenizer
+        self.logger = logger
 
     def build_prompt(self, history, user_message):
         # promptに履歴を追加

@@ -3,8 +3,6 @@
 # チャットはループで行われ、ユーザーの入力を受け取り、モデルに渡して応答を生成します。
 # チャット機能自体はllm/chat.pyが担当します。
 
-
-from config import Config
 from llm.chat import Chat
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
@@ -13,8 +11,9 @@ class Model:
 
     # コンストラクタ
     # モデルとトークナイザーを生成し、Chatクラスのインスタンスを作成します。
-    def __init__(self):
-        self.config = Config()
+    def __init__(self, config, logger):
+        self.config = config
+        self.logger = logger
         model_id = self.config.model_id
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         model = AutoModelForCausalLM.from_pretrained(
@@ -22,7 +21,7 @@ class Model:
             torch_dtype=torch.float16,
             device_map="auto"
         )
-        self.chat = Chat(model, tokenizer, self.config)
+        self.chat = Chat(model, tokenizer, self.config, self.logger)
 
     # チャットループを開始するメソッド
     def start_chat(self):

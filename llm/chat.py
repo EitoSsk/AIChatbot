@@ -11,17 +11,18 @@ from llm.prompt import PromptBuilder
 class Chat:
 
     # コンストラクタ
-    def __init__(self, model, tokenizer, config):
+    def __init__(self, model, tokenizer, config, logger):
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
-        self.history = History(config, tokenizer)
+        self.logger = logger
+        self.history = History(config, tokenizer, logger)
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
     def send_message(self, message):
         # PromptBuilderを使用して、履歴からプロンプトを構築
-        prompt_builder = PromptBuilder(self.config, self.tokenizer)
+        prompt_builder = PromptBuilder(self.config, self.tokenizer, self.logger)
         trimed_history = prompt_builder.trim_history_by_tokens(self.history.history, message)
         prompt = prompt_builder.build_prompt(trimed_history, message)
 
@@ -32,7 +33,6 @@ class Chat:
         response = self.generate_response(prompt)
         # 応答をチャット履歴に追加
         self.history.fetch_history("assistant", response, self.history.history)
-        print(self.history.history)
         return response
 
     # インプットから応答を生成するメソッド
@@ -62,6 +62,23 @@ class Chat:
         response = self.tokenizer.decode(
             outputs[0][inputs["input_ids"].shape[-1]:],
             skip_special_tokens=True,
+        )
+
+        # トークン数をログ出力
+        input_tokens_count = inputs["input_ids"].shape[-1]
+        response_tokens = self.tokenizer(
+            response,
+            return_tensors="pt",
+            add_special_tokens=False
+        )
+        response_tokens_count = response_tokens["input_ids"].shape[1]
+        self.logger.debug(
+f"""
+[Prompt]
+Input Tokens: {input_tokens_count}
+Response Tokens: {response_tokens_count} 
+Total Tokens: {input_tokens_count + response_tokens_count} 
+"""
         )
 
         return response
