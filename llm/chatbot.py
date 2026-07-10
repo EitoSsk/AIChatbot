@@ -7,21 +7,21 @@ from llm.chat import Chat
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-class Model:
+class Chatbot:
 
     # コンストラクタ
     # モデルとトークナイザーを生成し、Chatクラスのインスタンスを作成します。
     def __init__(self, config, logger):
-        self.config = config
-        self.logger = logger
-        model_id = self.config.model_id
+        self._config = config
+        self._logger = logger
+        model_id = self._config.model_id
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             torch_dtype=torch.float16,
             device_map="auto"
         )
-        self.chat = Chat(model, tokenizer, self.config, self.logger)
+        self._chat = Chat(model, tokenizer, self._config, self._logger)
 
     # チャットループを開始するメソッド
     def start_chat(self):
@@ -39,7 +39,7 @@ class Model:
             can_close = False
 
             try:
-                user_input = input(f"{self.config.user_name}: ")
+                user_input = input(f"{self._config.user_name}: ")
                 if user_input.lower() == "exit":
                     can_close = True
             except KeyboardInterrupt:
@@ -52,8 +52,8 @@ class Model:
             if not user_input.strip():
                 continue
             else:
-                response = self.chat.send_message(user_input)
-                print(f"{self.config.assistant_name}: {response}")
+                response = self._chat.send_message(user_input)
+                print(f"{self._config.assistant_name}: {response}")
 
     # チャットの終了処理
     def _close_chat(self):

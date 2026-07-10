@@ -29,10 +29,10 @@ from llm.prompt import PromptBuilder
 
 class History:
     def __init__(self, config, tokenizer, logger):
-        self.config = config
-        self.history_file = './data/history.json'
-        self.tokenizer = tokenizer
-        self.logger = logger
+        self._config = config
+        self._history_file = './data/history.json'
+        self._tokenizer = tokenizer
+        self._logger = logger
         self._all_history = []
         self.history = self.load_history()
 
@@ -41,19 +41,19 @@ class History:
     # メッセージの取得前に_discard_history()を呼び出して履歴を整理する
     # message_max_tokensの数だけ、直近のメッセージを取得する
     def load_history(self):
-        if not os.path.exists(self.history_file):
-            with open(self.history_file, 'w', encoding='utf-8') as f:
+        if not os.path.exists(self._history_file):
+            with open(self._history_file, 'w', encoding='utf-8') as f:
                 json.dump([], f, ensure_ascii=False, indent=4)
             return []
         
         try:
             self._discard_history()
-            with open(self.history_file, 'r', encoding='utf-8') as f:
+            with open(self._history_file, 'r', encoding='utf-8') as f:
                 self._all_history = json.load(f)
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.READ.value)
         
-        prompt_builder = PromptBuilder(self.config, self.tokenizer, self.logger)
+        prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
         return prompt_builder.trim_history_by_tokens(self._all_history.copy())
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
@@ -69,29 +69,29 @@ class History:
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.SAVE.value)
         
-        self.logger.debug(
+        self._logger.debug(
 f"""
 [History]
 Historys: {len(self.history)}
 Total Historys: {len(self._all_history)}
-History Name: {self.history_file}
+History Name: {self._history_file}
 """
         )
 
     # 履歴を保存するメソッド
     def _save_history(self):
-        with open(self.history_file, 'w', encoding='utf-8') as f:
+        with open(self._history_file, 'w', encoding='utf-8') as f:
             json.dump(self._all_history, f, ensure_ascii=False, indent=4)
 
     # 履歴を破棄するメソッド
     # history_max_tokensの数を超えた場合に、古いメッセージから削除される
     def _discard_history(self):
         # jsonファイルをロードして、メッセージの件数を確認する
-        with open(self.history_file, 'r', encoding='utf-8') as f:
+        with open(self._history_file, 'r', encoding='utf-8') as f:
             history = json.load(f)
         # history_max_tokensの数を超えた場合に、古いメッセージから削除される
-        while self.config.history_max_tokens and len(history) > self.config.history_max_tokens:
+        while self._config.history_max_tokens and len(history) > self._config.history_max_tokens:
             del history[:2]
         # 更新された履歴を保存する
-        with open(self.history_file, 'w', encoding='utf-8') as f:
+        with open(self._history_file, 'w', encoding='utf-8') as f:
             json.dump(history, f, ensure_ascii=False, indent=4)

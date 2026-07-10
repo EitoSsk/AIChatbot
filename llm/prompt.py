@@ -44,9 +44,9 @@ class PromptBuilder:
     """
 
     def __init__(self, config, tokenizer, logger):
-        self.config = config
-        self.tokenizer = tokenizer
-        self.logger = logger
+        self._config = config
+        self._tokenizer = tokenizer
+        self._logger = logger
 
     def build_prompt(self, history, user_message):
         # promptに履歴を追加
@@ -56,12 +56,6 @@ class PromptBuilder:
     
         # システムプロンプトを構築
         prompt = self._build_system_prompt(prompt, user_message)
-        return prompt
-
-    def _build_system_prompt(self, prompt, user_message):
-        # システムプロンプトの構築ロジックをここに実装
-        message = f"{self.SYSTEM_PROMPT}\n{user_message}"
-        prompt.append({'role': 'user', 'content': message, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
         return prompt
 
     # 履歴とシステムプロンプトの合計からトークン数を計算し、
@@ -81,17 +75,23 @@ class PromptBuilder:
             if len(prompt) < 2: break
 
             # トークナイズ
-            tokens = self.tokenizer.apply_chat_template(
+            tokens = self._tokenizer.apply_chat_template(
                 prompt,
                 tokenize=True,
                 return_tensors="pt",
                 add_generation_prompt=True,
             )
             # message_max_tokensの上限を超えなくなるまで履歴を破棄する
-            if tokens["input_ids"].shape[-1] > self.config.message_max_tokens:
+            if tokens["input_ids"].shape[-1] > self._config.message_max_tokens:
                 del prompt[:2]
                 del trimed_history[:2]
             else:
                 break
 
         return trimed_history
+
+    def _build_system_prompt(self, prompt, user_message):
+        # システムプロンプトの構築ロジックをここに実装
+        message = f"{self.SYSTEM_PROMPT}\n{user_message}"
+        prompt.append({'role': 'user', 'content': message, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        return prompt
