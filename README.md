@@ -30,8 +30,19 @@ project/
 ├── llm/
 │   ├── chatbot.py      # チャットのアウトプットのみ担当
 │   ├── chat.py         # 入力、履歴更新、modelの呼び出し、応答返却
-│   ├── prompt.py       # プロンプトの構築、コンテキスト制御
-│   └── history.py      # 履歴の読みこみ、保存、破棄。
+│   └── prompt.py       # プロンプトの構築、コンテキスト制御
+│
+├── repository/
+│   ├── entity/
+│   │   ├── history.py              # 履歴クラス（会話データ）
+│   │   ├── summary.py              # 要約クラス
+│   │   ├── memory.py               # 長期記憶クラス
+│   │   └── character.py            # キャラクタークラス
+│   │
+│   ├── history_repository.py       # 履歴の読みこみ、保存、破棄。
+│   ├── summary_repository.py       # 要約の読みこみ、保存。
+│   ├── memory_repository.py        # 長期記憶の読みこみ、保存。
+│   └── character_repository.py     # キャラクター情報の読み込み。
 │
 ├── speech/
 │   ├── stt.py          # Whisper

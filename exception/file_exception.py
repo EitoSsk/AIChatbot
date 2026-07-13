@@ -20,6 +20,12 @@ class PromptError(ApplicationException):
         return (
             f"プロンプト：\n{self.arg}\nチャットを終了します。"
         )
+    
+class CharacterError(ApplicationException):
+    def __str__(self):
+        return (
+            f"キャラクター：\n{self.arg}\nチャットを終了します。"
+        )
 
 # ファイルのエラー原因を表すEnumクラス
 class FileErrorType(Enum):

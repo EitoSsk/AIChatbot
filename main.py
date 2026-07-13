@@ -2,7 +2,7 @@
 
 from logger import Logger
 from config import Config
-from exception.file_exception import ConfigError, HistoryError, PromptError
+from exception.file_exception import CharacterError, ConfigError, HistoryError, PromptError
 from llm.chatbot import Chatbot
 
 if __name__ == "__main__":
@@ -12,7 +12,7 @@ if __name__ == "__main__":
         logger = Logger(config)
         chatbot = Chatbot(config, logger)
         chatbot.start_chat()
-    except (HistoryError, ConfigError, PromptError) as error:
+    except (HistoryError, ConfigError, PromptError, CharacterError) as error:
         e = error
 
     if (not e == None):
