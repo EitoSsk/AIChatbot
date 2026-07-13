@@ -1,2 +1,4 @@
 __pycache__
-/data/history.json
+/data/history/
+/data/summary/
+/data/memory/

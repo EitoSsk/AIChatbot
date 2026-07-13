@@ -28,9 +28,13 @@ from exception.file_exception import FileErrorType, HistoryError
 from llm.prompt import PromptBuilder
 
 class History:
+
+    _HISTORY_DIR = "./data/history/"
+
     def __init__(self, config, tokenizer, logger):
         self._config = config
-        self._history_file = './data/history.json'
+        date = datetime.now().strftime("%Y-%m")
+        self._history_file = f'{self._HISTORY_DIR}{date}.json'
         self._tokenizer = tokenizer
         self._logger = logger
         self._all_history = []
@@ -42,6 +46,8 @@ class History:
     # message_max_tokensの数だけ、直近のメッセージを取得する
     def load_history(self):
         if not os.path.exists(self._history_file):
+            if not os.path.exists(self._HISTORY_DIR):
+                os.makedirs(self._HISTORY_DIR, exist_ok=True)
             with open(self._history_file, 'w', encoding='utf-8') as f:
                 json.dump([], f, ensure_ascii=False, indent=4)
             return []
