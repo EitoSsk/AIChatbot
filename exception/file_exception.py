@@ -26,6 +26,12 @@ class CharacterError(ApplicationException):
         return (
             f"キャラクター：\n{self.arg}\nチャットを終了します。"
         )
+    
+class SummaryError(ApplicationException):
+    def __str__(self):
+        return (
+            f"サマリ：\n{self.arg}\nチャットを終了します。"
+        )
 
 # ファイルのエラー原因を表すEnumクラス
 class FileErrorType(Enum):

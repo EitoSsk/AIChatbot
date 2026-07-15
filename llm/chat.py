@@ -5,18 +5,20 @@
 #応答返却
 
 import torch
+from config import Config
+from logger import Logger
 from llm.history import History
 from llm.prompt import PromptBuilder
 
 class Chat:
 
     # コンストラクタ
-    def __init__(self, model, tokenizer, config, logger):
+    def __init__(self, model, tokenizer, history: History, config: Config, logger: Logger):
         self._model = model
         self._tokenizer = tokenizer
         self._config = config
         self._logger = logger
-        self._history = History(config, tokenizer, logger)
+        self._history = history
 
     # メッセージを送信するメソッド
     # レスポンスを返却する

@@ -83,6 +83,38 @@ Total Historys: {len(self._all_history)}
 History Name: {self._history_file}
 """
         )
+        
+    # 履歴のトークン数取得
+    def getAllHistoryTokens(self):
+        if self._all_history == []:
+            return 0
+
+        # トークナイズ
+        tokens = self._tokenizer.apply_chat_template(
+            self._all_history,
+            tokenize=True,
+            return_tensors="pt",
+            add_generation_prompt=True,
+        )
+        return tokens["input_ids"].shape[-1]
+    
+    # 日付指定で履歴を取得する(yyyy-MM)
+    def getHistoryFromDate(self, datetime, canTrim: bool):
+        date = datetime.strftime("%Y-%m")
+        file = f'{self._HISTORY_DIR}{date}.json'
+        if not os.path.exists(file):
+            return []
+        
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                all = json.load(f)
+                if canTrim:
+                    prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
+                    return prompt_builder.trim_history_by_tokens(all)
+                else:
+                    return all
+        except (FileNotFoundError, PermissionError) as e:
+            raise HistoryError(FileErrorType.READ.value)
 
     # 履歴を保存するメソッド
     def _save_history(self):

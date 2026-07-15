@@ -6,6 +6,9 @@
 from llm.chat import Chat
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+from llm.history import History
+from repository.summary_repository import SummaryRepository
+from usecase.create_summary_usecase import CreateSummaryUseCase
 
 class Chatbot:
 
@@ -15,16 +18,28 @@ class Chatbot:
         self._config = config
         self._logger = logger
         model_id = self._config.model_id
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModelForCausalLM.from_pretrained(
+        self._tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self._model = AutoModelForCausalLM.from_pretrained(
             model_id,
             torch_dtype=torch.float16,
             device_map="auto"
         )
-        self._chat = Chat(model, tokenizer, self._config, self._logger)
+        self._history = History(config, self._tokenizer, logger)
+        self._summary_repository = SummaryRepository(config, logger)
+        self._save_summary_usecase = CreateSummaryUseCase(
+            self._summary_repository,
+            self._history,
+            self._config,
+            self._logger
+        )
+        self._chat = Chat(self._model, self._tokenizer, self._history, self._config, self._logger)
 
     # チャットループを開始するメソッド
     def start_chat(self):
+        # 要約を作成する
+        self._save_summary_usecase.execute(self._model, self._tokenizer)
+
+        # チャットを開始する
         self._chat_loop()
 
     # チャットループの実装
