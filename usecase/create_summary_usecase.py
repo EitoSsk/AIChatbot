@@ -31,7 +31,7 @@ diff: {diff}
 """)
         if diff > self._config.message_max_tokens:
             self._logger.info("サマリを作成しています。しばらくお待ちください。")
-            self._summaryRepository.createSummary(model, tokenizer, self._history.history, history_tokens)
+            self._summaryRepository.createSummary(model, tokenizer, self._history.history.copy(), history_tokens)
         elif diff < 0:
             self._logger.info("サマリを作成しています。しばらくお待ちください。")
             prev_datetime = datetime.now() - relativedelta(months=1)
