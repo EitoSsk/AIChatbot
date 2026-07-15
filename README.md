@@ -44,6 +44,10 @@ project/
 │   ├── memory_repository.py        # 長期記憶の読みこみ、保存。
 │   └── character_repository.py     # キャラクター情報の読み込み。
 │
+├── usecase/            # まとまった処理群を定義。
+│   ├── save_summary_usecase.py
+│   └── ...
+│
 ├── speech/
 │   ├── stt.py          # Whisper
 │   ├── tts.py          # VOICEVOX
