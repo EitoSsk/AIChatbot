@@ -249,3 +249,14 @@ Github Copilotを用いてissueの一括作成, マイルストーンの設定�
 プロジェクト立ち上げ段階の土台作りはcopilotを用いて実装を行っていく。
 ある程度基盤が固まったところでコードアシストは最小限にして、
 アーキテクチャ、設計方針に基づいて実装していく。
+
+# 実行方法
+
+1. python3のインストール
+https://www.python.org/downloads/
+
+2. install.batの実行
+必要なpythonモジュールのインストールを行う。
+
+3. start_chat.bat
+チャットが起動される。
