@@ -25,7 +25,6 @@ from datetime import datetime
 import os
 import json
 from exception.file_exception import FileErrorType, HistoryError
-from llm.prompt import PromptBuilder
 
 class History:
 
@@ -38,10 +37,15 @@ class History:
         self._tokenizer = tokenizer
         self._logger = logger
         self._all_history = []
-        self._history = self.load_history()
 
     def getHistory(self):
         return self._history.copy()
+    
+    def getAllHistory(self):
+        return self._all_history.copy()
+    
+    def setHistory(self, history: list):
+        self._history = history
 
     # 履歴をロードするメソッド
     # history.jsonが存在しない場合は、新規作成される
@@ -61,9 +65,6 @@ class History:
                 self._all_history = json.load(f)
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.READ.value)
-        
-        prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
-        return prompt_builder.trim_history_by_tokens(self._all_history.copy())
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
@@ -102,7 +103,7 @@ History Name: {self._history_file}
         return tokens["input_ids"].shape[-1]
     
     # 日付指定で履歴を取得する(yyyy-MM)
-    def getHistoryFromDate(self, datetime, canTrim: bool):
+    def getHistoryFromDate(self, datetime):
         date = datetime.strftime("%Y-%m")
         file = f'{self._HISTORY_DIR}{date}.json'
         if not os.path.exists(file):
@@ -110,12 +111,7 @@ History Name: {self._history_file}
         
         try:
             with open(file, 'r', encoding='utf-8') as f:
-                all = json.load(f)
-                if canTrim:
-                    prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
-                    return prompt_builder.trim_history_by_tokens(all)
-                else:
-                    return all
+                return json.load(f)
         except (FileNotFoundError, PermissionError) as e:
             raise HistoryError(FileErrorType.READ.value)
 

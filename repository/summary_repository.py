@@ -6,6 +6,14 @@ from repository.entity.summary import Summary
 
 class SummaryRepository:
 
+    _SYSTEM_PROMPT = """以下は最近の会話を要約したものです。
+
+現在の状況や継続中の話題を理解するための参考情報です。
+直近の会話とのつながりを理解する目的で利用してください。
+
+[要約]
+"""
+
     # コンストラクタ
     def __init__(self, config, logger):
         self._config = config
@@ -20,3 +28,15 @@ class SummaryRepository:
     
     def getSummary(self):
         return self._summary.getSummary()
+    
+    def build_prompt(self):
+        summary = self._summary.getSummary()
+        if summary == "":
+            summary = "なし"
+        prompt = [
+            "=========================================================",
+            self._SYSTEM_PROMPT,
+            summary,
+        ]
+
+        return "\n".join(prompt)

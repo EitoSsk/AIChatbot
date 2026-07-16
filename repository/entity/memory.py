@@ -20,6 +20,13 @@ class Memory:
         self._memory_data = {}
         self._loadMemory()
 
+    # メモリ取得
+    def getMemory(self):
+        if self._memory_data == {}:
+            ""
+        else:
+            return self._memory_data["memory"]
+
     # メモリ作成
     # 応答を長期記憶として保存する
     def create(self, model, tokenizer, summary):

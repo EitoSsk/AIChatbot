@@ -11,6 +11,7 @@ from repository.memory_repository import MemoryRepository
 from repository.summary_repository import SummaryRepository
 from usecase.create_memory_usecase import CreateMemoryUseCase
 from usecase.create_summary_usecase import CreateSummaryUseCase
+from usecase.load_history_usecase import LoadHistoryUseCase
 
 class Chatbot:
 
@@ -29,6 +30,12 @@ class Chatbot:
         self._history_repository = HistoryRepository(config, self._tokenizer, logger)
         self._summary_repository = SummaryRepository(config, logger)
         self._memory_repository = MemoryRepository(config, logger)
+        self._load_history_usecase = LoadHistoryUseCase(
+            self._config,
+            self._logger,
+            self._tokenizer,
+            self._history_repository
+        )
         self._create_summary_usecase = CreateSummaryUseCase(
             self._summary_repository,
             self._history_repository,
@@ -41,10 +48,20 @@ class Chatbot:
             self._config,
             self._logger
         )
-        self._chat = Chat(self._model, self._tokenizer, self._history_repository, self._config, self._logger)
+        self._chat = Chat(
+            self._model, 
+            self._tokenizer, 
+            self._history_repository, 
+            self._summary_repository, 
+            self._memory_repository, 
+            self._config, 
+            self._logger
+        )
 
     # チャットループを開始するメソッド
     def start_chat(self):
+        # 履歴のロード
+        self._load_history_usecase.execute()
         # 要約・長期記憶を作成する
         canCreateMemory = self._create_summary_usecase.execute(self._model, self._tokenizer)
         if canCreateMemory:

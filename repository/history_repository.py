@@ -13,6 +13,15 @@ class HistoryRepository:
 
     def getHistory(self):
         return self._history.getHistory()
+    
+    def getAllHistory(self):
+        return self._history.getAllHistory()
+
+    def setHistory(self, history: list):
+        self._history.setHistory(history)
+
+    def load_history(self):
+        self._history.load_history()
 
     def fetch_history(self, role, content, history: list):
         self._history.fetch_history(role, content, history)
@@ -20,5 +29,5 @@ class HistoryRepository:
     def getAllHistoryTokens(self):
         return self._history.getAllHistoryTokens()
     
-    def getHistoryFromDate(self, datetime, canTrim: bool):
-        return self._history.getHistoryFromDate(datetime, canTrim)
+    def getHistoryFromDate(self, datetime):
+        return self._history.getHistoryFromDate(datetime)

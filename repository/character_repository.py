@@ -29,7 +29,6 @@ class CharacterRepository:
             "=========================================================",
             f"あなたは「{self._character._character_data['name']}」というAIアシスタントです。",
             sections_str,
-            "=========================================================",
         ]
 
         return "\n".join(prompt)

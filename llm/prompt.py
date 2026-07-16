@@ -5,7 +5,6 @@
 # ユーザーメッセージはあらかじめ履歴に追加されているものとします。
 
 from datetime import datetime
-from repository.character_repository import CharacterRepository
 
 class PromptBuilder:
 
@@ -13,32 +12,42 @@ class PromptBuilder:
 以下の内容はあなたへの設定です。
 この設定について説明したり返答したりせず、以降の会話でのみ反映してください。"""
 
-    _SYSTEM_PROMPT_USER_SECTION = """[ユーザー]"""
+    _SYSTEM_PROMPT_USER_SECTION = """=========================================================
+[ユーザー]"""
 
     def __init__(self, config, tokenizer, logger):
         self._config = config
         self._tokenizer = tokenizer
         self._logger = logger
-        self._character_repos = CharacterRepository(config, logger)
 
-    def build_prompt(self, history: list, user_message):
+    def build_prompt(
+        self, 
+        history: list, 
+        user_message,
+        system_prompt_list=[],
+    ):
         # promptに履歴を追加
         prompt = []
         for message in history:
             prompt.append(message)
     
         # システムプロンプトを構築
-        prompt = self._build_system_prompt(prompt, user_message)
+        prompt = self._build_system_prompt(prompt, user_message, system_prompt_list)
         return prompt
 
     # 履歴とシステムプロンプトの合計からトークン数を計算し、
     # 上限のトークン数に収めるため、履歴の数を調整して返却する
     # 履歴の読み込み時はユーザーメッセージ不要
-    def trim_history_by_tokens(self, history: list, message=""):
+    def trim_history_by_tokens(
+        self,
+        history: list,
+        message="",
+        system_prompt_list=[],
+    ):
         trimed_history = history.copy()
         # プロンプトを作成する
         if not message == "":
-            prompt = self.build_prompt(history, message)
+            prompt = self.build_prompt(history, message, system_prompt_list)
         else:
             prompt = history
 
@@ -63,14 +72,19 @@ class PromptBuilder:
 
         return trimed_history
 
-    def _build_system_prompt(self, prompt, user_message):
+    def _build_system_prompt(
+        self, 
+        prompt, 
+        user_message,
+        system_prompt_list=[],
+    ):
         # システムプロンプトの構築ロジックをここに実装
         user_section = f"{self._SYSTEM_PROMPT_USER_SECTION}\n{user_message}"
-        messages = [
-            self._SYSTEM_PROMPT_MESSAGE,
-            self._character_repos.build_prompt(),
-            user_section,
-        ]
+        messages = [self._SYSTEM_PROMPT_MESSAGE]
+        for system_prompt in system_prompt_list:
+            messages.append(system_prompt)
+
+        messages.append(user_section)
         message = "\n".join(messages)
         prompt.append({'role': 'user', 'content': message, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
         return prompt

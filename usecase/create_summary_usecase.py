@@ -6,6 +6,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from config import Config
+from llm.prompt import PromptBuilder
 from repository.history_repository import HistoryRepository
 from logger import Logger
 from repository.summary_repository import SummaryRepository
@@ -37,8 +38,13 @@ diff: {diff}
         elif diff < 0:
             self._logger.info("サマリを作成しています。しばらくお待ちください。")
             prev_datetime = datetime.now() - relativedelta(months=1)
-            prev_month_history = self._history_repository.getHistoryFromDate(prev_datetime, canTrim=True)
+            prev_month_history = self._getHistoryFromDate(prev_datetime)
             self._summary_repository.createSummary(model, tokenizer, prev_month_history, 0)
             return True
         else:
             return False
+        
+    def _getHistoryFromDate(self, tokenizer, date):
+        history = self._history_repository.getHistoryFromDate(date)
+        prompt_builder = PromptBuilder(self._config, tokenizer, self._logger)
+        return prompt_builder.trim_history_by_tokens(history)

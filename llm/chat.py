@@ -4,6 +4,9 @@
 #チャット履歴の更新
 #応答返却
 
+from repository.character_repository import CharacterRepository
+from repository.memory_repository import MemoryRepository
+from repository.summary_repository import SummaryRepository
 import torch
 from config import Config
 from logger import Logger
@@ -13,28 +16,52 @@ from llm.prompt import PromptBuilder
 class Chat:
 
     # コンストラクタ
-    def __init__(self, model, tokenizer, historyRepository: HistoryRepository, config: Config, logger: Logger):
+    def __init__(
+        self, 
+        model, 
+        tokenizer, 
+        history_repository: HistoryRepository, 
+        summary_repository: SummaryRepository, 
+        memory_repository: MemoryRepository, 
+        config: Config, 
+        logger: Logger
+    ):
         self._model = model
         self._tokenizer = tokenizer
         self._config = config
         self._logger = logger
-        self._historyRepository = historyRepository
+        self._history_repository = history_repository
+        self._summary_repository = summary_repository
+        self._memory_repository = memory_repository
+        self._character_repository = CharacterRepository(config, logger)
+        self._system_prompt_list = [
+            self._character_repository.build_prompt(),
+            self._summary_repository.build_prompt(),
+            self._memory_repository.build_prompt()
+        ]
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
     def send_message(self, message):
         # PromptBuilderを使用して、履歴からプロンプトを構築
         prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
-        trimed_history = prompt_builder.trim_history_by_tokens(self._historyRepository.getHistory(), message)
-        prompt = prompt_builder.build_prompt(trimed_history, message)
+        trimed_history = prompt_builder.trim_history_by_tokens(
+            self._history_repository.getHistory(), 
+            message,
+            self._system_prompt_list
+        )
+        prompt = prompt_builder.build_prompt(
+            trimed_history, message,
+            self._system_prompt_list
+        )
 
         # 履歴の更新（システムプロンプトは含めない）
-        self._historyRepository.fetch_history("user", message, trimed_history)
+        self._history_repository.fetch_history("user", message, trimed_history)
 
         # 応答を生成
         response = self._generate_response(prompt)
         # 応答をチャット履歴に追加
-        self._historyRepository.fetch_history("assistant", response, self._historyRepository.getHistory())
+        self._history_repository.fetch_history("assistant", response, self._history_repository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド
