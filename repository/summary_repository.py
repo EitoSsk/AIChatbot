@@ -17,3 +17,6 @@ class SummaryRepository:
 
     def getLastHistoryTokens(self):
         return self._summary.getLastHistoryTokens()
+    
+    def getSummary(self):
+        return self._summary.getSummary()

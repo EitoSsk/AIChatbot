@@ -32,6 +32,12 @@ class SummaryError(ApplicationException):
         return (
             f"サマリ：\n{self.arg}\nチャットを終了します。"
         )
+    
+class MemoryError(ApplicationException):
+    def __str__(self):
+        return (
+            f"メモリ：\n{self.arg}\nチャットを終了します。"
+        )
 
 # ファイルのエラー原因を表すEnumクラス
 class FileErrorType(Enum):

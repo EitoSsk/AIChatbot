@@ -91,6 +91,9 @@ class Summary:
             return 0
         else:
             return self._summary_data["last_history_tokens"]
+        
+    def getSummary(self):
+        return self._summary_data["summary"]
 
     # 今月のサマリを取得する
     # 今月のサマリファイルがなければ先月のサマリファイルを取得する

@@ -7,7 +7,9 @@ from llm.chat import Chat
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from llm.history import History
+from repository.memory_repository import MemoryRepository
 from repository.summary_repository import SummaryRepository
+from usecase.create_memory_usecase import CreateMemoryUseCase
 from usecase.create_summary_usecase import CreateSummaryUseCase
 
 class Chatbot:
@@ -26,9 +28,16 @@ class Chatbot:
         )
         self._history = History(config, self._tokenizer, logger)
         self._summary_repository = SummaryRepository(config, logger)
-        self._save_summary_usecase = CreateSummaryUseCase(
+        self._memory_repository = MemoryRepository(config, logger)
+        self._create_summary_usecase = CreateSummaryUseCase(
             self._summary_repository,
             self._history,
+            self._config,
+            self._logger
+        )
+        self._create_memory_usecase = CreateMemoryUseCase(
+            self._summary_repository,
+            self._memory_repository,
             self._config,
             self._logger
         )
@@ -36,8 +45,10 @@ class Chatbot:
 
     # チャットループを開始するメソッド
     def start_chat(self):
-        # 要約を作成する
-        self._save_summary_usecase.execute(self._model, self._tokenizer)
+        # 要約・長期記憶を作成する
+        canCreateMemory = self._create_summary_usecase.execute(self._model, self._tokenizer)
+        if canCreateMemory:
+            self._create_memory_usecase.execute(self._model, self._tokenizer)
 
         # チャットを開始する
         self._chat_loop()
