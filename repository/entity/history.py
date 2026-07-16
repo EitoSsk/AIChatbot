@@ -38,7 +38,10 @@ class History:
         self._tokenizer = tokenizer
         self._logger = logger
         self._all_history = []
-        self.history = self.load_history()
+        self._history = self.load_history()
+
+    def getHistory(self):
+        return self._history.copy()
 
     # 履歴をロードするメソッド
     # history.jsonが存在しない場合は、新規作成される
@@ -64,10 +67,10 @@ class History:
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
-    def fetch_history(self, role, content, history):
-        self.history = history.copy()
+    def fetch_history(self, role, content, history: list):
+        self._history = history.copy()
         new = {'role': role, 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        self.history.append(new)
+        self._history.append(new)
         self._all_history.append(new)
 
         try:
@@ -78,7 +81,7 @@ class History:
         self._logger.debug(
 f"""
 [History]
-Historys: {len(self.history)}
+Historys: {len(self._history)}
 Total Historys: {len(self._all_history)}
 History Name: {self._history_file}
 """

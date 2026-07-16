@@ -6,7 +6,7 @@
 from llm.chat import Chat
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-from llm.history import History
+from repository.history_repository import HistoryRepository
 from repository.memory_repository import MemoryRepository
 from repository.summary_repository import SummaryRepository
 from usecase.create_memory_usecase import CreateMemoryUseCase
@@ -26,12 +26,12 @@ class Chatbot:
             torch_dtype=torch.float16,
             device_map="auto"
         )
-        self._history = History(config, self._tokenizer, logger)
+        self._history_repository = HistoryRepository(config, self._tokenizer, logger)
         self._summary_repository = SummaryRepository(config, logger)
         self._memory_repository = MemoryRepository(config, logger)
         self._create_summary_usecase = CreateSummaryUseCase(
             self._summary_repository,
-            self._history,
+            self._history_repository,
             self._config,
             self._logger
         )
@@ -41,7 +41,7 @@ class Chatbot:
             self._config,
             self._logger
         )
-        self._chat = Chat(self._model, self._tokenizer, self._history, self._config, self._logger)
+        self._chat = Chat(self._model, self._tokenizer, self._history_repository, self._config, self._logger)
 
     # チャットループを開始するメソッド
     def start_chat(self):

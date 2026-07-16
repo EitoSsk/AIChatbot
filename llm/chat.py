@@ -7,34 +7,34 @@
 import torch
 from config import Config
 from logger import Logger
-from llm.history import History
+from repository.history_repository import HistoryRepository
 from llm.prompt import PromptBuilder
 
 class Chat:
 
     # コンストラクタ
-    def __init__(self, model, tokenizer, history: History, config: Config, logger: Logger):
+    def __init__(self, model, tokenizer, historyRepository: HistoryRepository, config: Config, logger: Logger):
         self._model = model
         self._tokenizer = tokenizer
         self._config = config
         self._logger = logger
-        self._history = history
+        self._historyRepository = historyRepository
 
     # メッセージを送信するメソッド
     # レスポンスを返却する
     def send_message(self, message):
         # PromptBuilderを使用して、履歴からプロンプトを構築
         prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
-        trimed_history = prompt_builder.trim_history_by_tokens(self._history.history, message)
+        trimed_history = prompt_builder.trim_history_by_tokens(self._historyRepository.getHistory(), message)
         prompt = prompt_builder.build_prompt(trimed_history, message)
 
         # 履歴の更新（システムプロンプトは含めない）
-        self._history.fetch_history("user", message, trimed_history)
+        self._historyRepository.fetch_history("user", message, trimed_history)
 
         # 応答を生成
         response = self._generate_response(prompt)
         # 応答をチャット履歴に追加
-        self._history.fetch_history("assistant", response, self._history.history)
+        self._historyRepository.fetch_history("assistant", response, self._historyRepository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド

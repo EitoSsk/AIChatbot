@@ -21,7 +21,7 @@ class PromptBuilder:
         self._logger = logger
         self._character_repos = CharacterRepository(config, logger)
 
-    def build_prompt(self, history, user_message):
+    def build_prompt(self, history: list, user_message):
         # promptに履歴を追加
         prompt = []
         for message in history:
@@ -34,7 +34,7 @@ class PromptBuilder:
     # 履歴とシステムプロンプトの合計からトークン数を計算し、
     # 上限のトークン数に収めるため、履歴の数を調整して返却する
     # 履歴の読み込み時はユーザーメッセージ不要
-    def trim_history_by_tokens(self, history, message=""):
+    def trim_history_by_tokens(self, history: list, message=""):
         trimed_history = history.copy()
         # プロンプトを作成する
         if not message == "":
