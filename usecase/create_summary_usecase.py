@@ -38,7 +38,7 @@ diff: {diff}
         elif diff < 0:
             self._logger.info("サマリを作成しています。しばらくお待ちください。")
             prev_datetime = datetime.now() - relativedelta(months=1)
-            prev_month_history = self._getHistoryFromDate(prev_datetime)
+            prev_month_history = self._getHistoryFromDate(tokenizer, prev_datetime)
             self._summary_repository.createSummary(model, tokenizer, prev_month_history, 0)
             return True
         else:
