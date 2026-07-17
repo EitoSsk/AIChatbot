@@ -5,3 +5,4 @@ safetensors
 huggingface_hub
 python-dateutil
 tokenizers
+requests

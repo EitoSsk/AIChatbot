@@ -42,11 +42,16 @@ project/
 │   ├── history_repository.py       # 履歴の読みこみ、保存、破棄。
 │   ├── summary_repository.py       # 要約の読みこみ、保存。
 │   ├── memory_repository.py        # 長期記憶の読みこみ、保存。
-│   └── character_repository.py     # キャラクター情報の読み込み。
+│   ├── character_repository.py     # キャラクター情報の読み込み。
+│   └── voice_repository.py         # 音声作成。
 │
 ├── usecase/            # まとまった処理群を定義。
 │   ├── save_summary_usecase.py
 │   └── ...
+│
+├── core/
+│   └── network/              # 通信機能関連
+│       └── http_client.py    # HTTP通信の機能を提供する。
 │
 ├── speech/
 │   ├── stt.py          # Whisper
@@ -257,8 +262,14 @@ Github Copilotを用いてissueの一括作成, マイルストーンの設定�
 1. python3のインストール
 https://www.python.org/downloads/
 
-2. install.batの実行
+2. VOICEVOXのインストール
+https://voicevox.hiroshiba.jp/
+
+APIのドキュメントはVOICEVOXを起動中に下記を開く
+http://127.0.0.1:50021/docs
+
+3. install.batの実行
 必要なpythonモジュールのインストールを行う。
 
-3. start_chat.bat
+4. start_chat.bat
 チャットが起動される。
