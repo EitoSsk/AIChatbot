@@ -35,7 +35,7 @@ class MemoryRepository:
 
     def build_prompt(self):
         memory = self._memory.getMemory()
-        if memory == "":
+        if memory == "" or memory == None:
             memory = "なし"
         prompt = [
             "=========================================================",

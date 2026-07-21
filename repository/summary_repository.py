@@ -31,7 +31,7 @@ class SummaryRepository:
     
     def build_prompt(self):
         summary = self._summary.getSummary()
-        if summary == "":
+        if summary == "" or summary == None:
             summary = "なし"
         prompt = [
             "=========================================================",
