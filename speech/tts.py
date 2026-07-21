@@ -16,3 +16,6 @@ class TTS:
     def play(self, text: str):
         data = self._repos.queryVoice(text)
         audio.play(data)
+
+    def wait(self):
+        audio.wait()

@@ -6,4 +6,5 @@ huggingface_hub
 python-dateutil
 tokenizers
 requests
-simpleaudio
+sounddevice
+numpy

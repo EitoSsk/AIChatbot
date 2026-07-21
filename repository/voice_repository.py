@@ -13,17 +13,19 @@ class VoiceRepository:
 
     def queryVoice(self, content: str):
         client = HttpClient(self._config, self._logger)
+        # クエリの取得
         query_res = client.request(
             api = API_AUDIO_QUERY,
             params = {
                 "text": content,
-                "speaker": 16
+                "speaker": 20
             }
         )
+        # 音声合成
         synthesis_res = client.request(
             api = API_SYNTHESIS,
             params = {
-                "speaker": 16
+                "speaker": 20
             },
             json = query_res.json()
         )

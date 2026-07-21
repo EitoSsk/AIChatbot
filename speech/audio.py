@@ -2,19 +2,14 @@
 
 import io
 import wave
-import simpleaudio
+import sounddevice as sd
+import numpy as np
 
-def play(data: bytes):
-    wav_file = wave.open(io.BytesIO(data), "rb")
-
-    channels = wav_file.getnchannels()
-    sample_width = wav_file.getsampwidth()
+def play(wav_data: bytes):
+    wav_file = wave.open(io.BytesIO(wav_data), "rb")
     sample_rate = wav_file.getframerate()
-    pcm_data = wav_file.readframes(wav_file.getnframes())
-    play_obj = simpleaudio.play_buffer(
-        pcm_data,
-        channels,
-        sample_width,
-        sample_rate,
-    )
-    play_obj.wait_done()
+    wav_array = np.frombuffer(wav_data, dtype=np.int16)
+    sd.play(wav_array, sample_rate, blocking=False)
+
+def wait():
+    sd.wait()

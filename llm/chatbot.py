@@ -98,8 +98,9 @@ class Chatbot:
                 continue
             else:
                 response = self._chat.send_message(user_input)
-                print(f"{self._config.assistant_name}: {response}")
                 self._tts.play(response)
+                print(f"{self._config.assistant_name}: {response}")
+                self._tts.wait()
 
     # チャットの終了処理
     def _close_chat(self):
