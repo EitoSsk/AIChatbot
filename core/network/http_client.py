@@ -32,9 +32,10 @@ class HttpClient:
         try:
             response.raise_for_status()
             return response
-        except requests.ConnectTimeout:
-            self._logger.debug(f"NetworkError: timeout")
-            raise NetworkError(is_timeout=True)
-        except:
+        except (requests.ConnectionError, requests.ConnectTimeout, requests.ReadTimeout) as e:
+            raise e
+        except (requests.HTTPError) as e:
             self._logger.debug(f"NetworkError: status_code={response.status_code}")
-            raise NetworkError(status_code=response.status_code)
+            raise e
+        except Exception as e:
+            raise e

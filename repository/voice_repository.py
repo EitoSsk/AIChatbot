@@ -1,6 +1,7 @@
 # 音声リポジトリクラス
 # 音声データを作成する機能を提供する
 
+import requests
 from core.data.exception.network_exception import NetworkError
 from core.data.exception.voice_exception import VoiceEngineNotRunningError, VoiceNetworkError, VoiceTimeoutError
 from core.data.response import Response
@@ -30,15 +31,14 @@ class VoiceRepository:
                     "speaker": speaker
                 }
             )
-        except NetworkError as e:
-            if e.status_code == 400 or e.status_code == 404 or e.status_code == 422:
-                raise VoiceEngineNotRunningError()
-            elif e.status_code == 500:
-                raise VoiceNetworkError()
-            elif e.is_timeout:
-                raise VoiceTimeoutError()
-            else:
-                raise VoiceNetworkError()
+        except (requests.ConnectTimeout, requests.ConnectionError):
+            raise VoiceEngineNotRunningError()
+        except requests.ReadTimeout:
+            raise VoiceTimeoutError()
+        except requests.HTTPError:
+            raise VoiceNetworkError()
+        except Exception:
+            raise VoiceNetworkError()
         
         # 音声編集
         query_json = query_res.json()
@@ -87,14 +87,13 @@ emotion={message.emotion.name}""")
                 },
                 json = query_json
             )
-        except NetworkError as e:
-            if e.status_code == 400 or e.status_code == 404 or e.status_code == 422:
-                raise VoiceEngineNotRunningError()
-            elif e.status_code == 500:
-                raise VoiceNetworkError()
-            elif e.is_timeout:
-                raise VoiceTimeoutError()
-            else:
-                raise VoiceNetworkError()
+        except (requests.ConnectTimeout, requests.ConnectionError):
+            raise VoiceEngineNotRunningError()
+        except requests.ReadTimeout:
+            raise VoiceTimeoutError()
+        except requests.HTTPError:
+            raise VoiceNetworkError()
+        except Exception:
+            raise VoiceNetworkError()
         
         return  synthesis_res.content
