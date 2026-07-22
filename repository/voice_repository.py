@@ -1,6 +1,8 @@
 # 音声リポジトリクラス
 # 音声データを作成する機能を提供する
 
+from core.data.exception.network_exception import NetworkError
+from core.data.exception.voice_exception import VoiceEngineNotRunningError, VoiceNetworkError, VoiceTimeoutError
 from core.data.response import Response
 from core.data.emotion import Emotion
 from core.network.http_client import API_AUDIO_QUERY, API_SYNTHESIS, HttpClient
@@ -20,13 +22,23 @@ class VoiceRepository:
             voice_setting["neutral"]
         )
         # クエリの取得
-        query_res = client.request(
-            api = API_AUDIO_QUERY,
-            params = {
-                "text": message.message,
-                "speaker": speaker
-            }
-        )
+        try:
+            query_res = client.request(
+                api = API_AUDIO_QUERY,
+                params = {
+                    "text": message.message,
+                    "speaker": speaker
+                }
+            )
+        except NetworkError as e:
+            if e.status_code == 400 or e.status_code == 404 or e.status_code == 422:
+                raise VoiceEngineNotRunningError()
+            elif e.status_code == 500:
+                raise VoiceNetworkError()
+            elif e.is_timeout:
+                raise VoiceTimeoutError()
+            else:
+                raise VoiceNetworkError()
         
         # 音声編集
         query_json = query_res.json()
@@ -67,11 +79,22 @@ speaker={speaker}
 emotion={message.emotion.name}""")
 
         # 音声合成
-        synthesis_res = client.request(
-            api = API_SYNTHESIS,
-            params = {
-                "speaker": speaker
-            },
-            json = query_json
-        )
+        try:
+            synthesis_res = client.request(
+                api = API_SYNTHESIS,
+                params = {
+                    "speaker": speaker
+                },
+                json = query_json
+            )
+        except NetworkError as e:
+            if e.status_code == 400 or e.status_code == 404 or e.status_code == 422:
+                raise VoiceEngineNotRunningError()
+            elif e.status_code == 500:
+                raise VoiceNetworkError()
+            elif e.is_timeout:
+                raise VoiceTimeoutError()
+            else:
+                raise VoiceNetworkError()
+        
         return  synthesis_res.content

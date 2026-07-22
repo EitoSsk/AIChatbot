@@ -1,6 +1,6 @@
 # HTTPクライアントクラス
 
-from core.data.exception.network_exception import NewWorkError
+from core.data.exception.network_exception import NetworkError
 from logger import Logger
 import requests
 from config import Config
@@ -32,5 +32,9 @@ class HttpClient:
         try:
             response.raise_for_status()
             return response
+        except requests.ConnectTimeout:
+            self._logger.debug(f"NetworkError: timeout")
+            raise NetworkError(is_timeout=True)
         except:
-            raise NewWorkError()
+            self._logger.debug(f"NetworkError: status_code={response.status_code}")
+            raise NetworkError(status_code=response.status_code)
