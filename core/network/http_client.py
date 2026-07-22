@@ -11,6 +11,8 @@ API_SYNTHESIS = "http://localhost:50021/synthesis"
 
 class HttpClient:
 
+    _DEFAULT_TIMEOUT: tuple[int, int] = (5, 30)
+
     def __init__(self, config: Config, logger: Logger):
         self._config = config
         self._logger = logger
@@ -19,7 +21,7 @@ class HttpClient:
         api: str,
         params: dict = None,
         json: dict = None,
-        timeout: int = 5,
+        timeout: tuple[int, int] = _DEFAULT_TIMEOUT,
     ):
         response = requests.post(
             url = api,

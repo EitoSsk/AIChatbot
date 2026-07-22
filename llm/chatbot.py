@@ -4,6 +4,7 @@
 # チャット機能自体はllm/chat.pyが担当します。
 
 from llm.chat import Chat
+from repository.character_repository import CharacterRepository
 from speech.tts import TTS
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
@@ -31,6 +32,7 @@ class Chatbot:
         self._history_repository = HistoryRepository(config, self._tokenizer, logger)
         self._summary_repository = SummaryRepository(config, logger)
         self._memory_repository = MemoryRepository(config, logger)
+        self._character_repository = CharacterRepository(config, logger)
         self._load_history_usecase = LoadHistoryUseCase(
             self._config,
             self._logger,
@@ -54,11 +56,16 @@ class Chatbot:
             self._tokenizer, 
             self._history_repository, 
             self._summary_repository, 
-            self._memory_repository, 
+            self._memory_repository,
+            self._character_repository,
             self._config, 
             self._logger
         )
-        self._tts = TTS(self._config, self._logger)
+        self._tts = TTS(
+            self._config,
+            self._logger,
+            self._character_repository
+        )
 
     # チャットループを開始するメソッド
     def start_chat(self):

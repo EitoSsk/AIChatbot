@@ -16,6 +16,7 @@ class Character:
         self._character_data = self._load()
         self._name = self._character_data["name"]
         self._sections = self._character_data["sections"]
+        self._voive = self._character_data["voice"]
 
     # 読み込み
     # character.jsonからキャラクターデータを読み込む
