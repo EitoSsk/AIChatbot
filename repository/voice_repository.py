@@ -1,7 +1,7 @@
 # 音声リポジトリクラス
 # 音声データを作成する機能を提供する
 
-from core.data.message import Message
+from core.data.response import Response
 from core.data.emotion import Emotion
 from core.network.http_client import API_AUDIO_QUERY, API_SYNTHESIS, HttpClient
 from logger import Logger
@@ -13,14 +13,14 @@ class VoiceRepository:
         self._config = config
         self._logger = logger
 
-    def queryVoice(self, message: Message):
+    def queryVoice(self, message: Response):
         client = HttpClient(self._config, self._logger)
         speaker = 20
         # クエリの取得
         query_res = client.request(
             api = API_AUDIO_QUERY,
             params = {
-                "text": message.text,
+                "text": message.message,
                 "speaker": speaker
             }
         )

@@ -4,7 +4,7 @@
 #チャット履歴の更新
 #応答返却
 
-from core.data.message import Message
+from core.data.response import Response
 import re
 from core.data.emotion import Emotion
 from repository.character_repository import CharacterRepository
@@ -64,13 +64,13 @@ class Chat:
         # 応答を生成
         response = self._generate_response(prompt)
         # 応答をチャット履歴に追加
-        self._history_repository.fetch_history("assistant", response.text, self._history_repository.getHistory())
+        self._history_repository.fetch_history("assistant", response.message, self._history_repository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド
     # ここでは、モデルを使用して応答を生成するロジックを実装する
     # tokenizer と model を使用して、入力メッセージに基づいて応答を生成する
-    def _generate_response(self, prompt) -> Message:
+    def _generate_response(self, prompt) -> Response:
         # トークナイズ
         inputs = self._tokenizer.apply_chat_template(
             prompt,
@@ -116,15 +116,15 @@ Total Tokens: {input_tokens_count + response_tokens_count}
         # 感情とメッセージに分解
         return  self._extract_message(response)
     
-    def _extract_message(self, text: str) -> Message:
+    def _extract_message(self, text: str) -> Response:
         EMOTION_PATTERN = re.compile(r"^\[EMOTION:([A-Za-z_]+)\]\s*", re.MULTILINE)
         match = EMOTION_PATTERN.match(text)
 
         if match is None:
             # 感情が取得できなかった場合はNEUTRAL扱い
-            return Message(text.strip(), Emotion.NEUTRAL)
+            return Response(text.strip(), Emotion.NEUTRAL)
 
         emotion = Emotion.from_string(match.group(1))
         message = EMOTION_PATTERN.sub("", text, count=1).strip()
-        return Message(message, emotion)
+        return Response(message, emotion)
     
