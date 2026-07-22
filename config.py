@@ -7,7 +7,7 @@
 import json
 import os
 
-from exception.file_exception import ConfigError, FileErrorType
+from core.data.exception.file_exception import ConfigError, FileErrorType
 
 class Config:
     

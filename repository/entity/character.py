@@ -4,7 +4,7 @@
 # キャラクター情報からシステムプロンプトを構成する情報を作成する
 
 import json
-from exception.file_exception import CharacterError, FileErrorType
+from core.data.exception.file_exception import CharacterError, FileErrorType
 
 class Character:
 

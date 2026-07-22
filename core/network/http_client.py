@@ -1,6 +1,6 @@
 # HTTPクライアントクラス
 
-from exception.network_exception import NewWorkError
+from core.data.exception.network_exception import NewWorkError
 from logger import Logger
 import requests
 from config import Config

@@ -2,7 +2,7 @@
 
 from logger import Logger
 from config import Config
-from exception.file_exception import CharacterError, ConfigError, HistoryError, PromptError, SummaryError, MemoryError
+from core.data.exception.file_exception import CharacterError, ConfigError, HistoryError, PromptError, SummaryError, MemoryError
 from llm.chatbot import Chatbot
 
 if __name__ == "__main__":

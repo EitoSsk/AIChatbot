@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 import json
 import torch
-from exception.file_exception import MemoryError, FileErrorType
+from core.data.exception.file_exception import MemoryError, FileErrorType
 
 class Memory:
 

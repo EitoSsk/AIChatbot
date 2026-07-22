@@ -1,7 +1,7 @@
 # ファイル関連例外クラス
 
 from enum import Enum
-from exception.application_exception import ApplicationException
+from core.data.exception.application_exception import ApplicationException
 
 class HistoryError(ApplicationException):
     def __str__(self):

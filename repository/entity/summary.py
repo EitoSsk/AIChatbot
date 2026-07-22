@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 import os
 import json
 import torch
-from exception.file_exception import SummaryError, FileErrorType
+from core.data.exception.file_exception import SummaryError, FileErrorType
 
 class Summary:
 
