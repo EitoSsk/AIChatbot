@@ -32,8 +32,11 @@ class TTS:
             audio.play(data)
         except VoiceEngineNotRunningError:
             self._voice_enabled = False
-            self._logger.debug("音声が再生できません。VOICEVOXエンジンを起動、もしくはインストールしてください。")
-        except (VoiceNetworkError, VoicePlaybackError, VoiceTimeoutError):
+            self._logger.debug("VOICEVOXエンジンを起動されていないか、接続できない状況です。")
+        except VoiceTimeoutError:
+            self._logger.debug("VOICEVOXエンジンとの通信がタイムアウトしました。")
+        except (VoicePlaybackError, VoiceNetworkError):
+            self._voice_enabled = False
             self._logger.debug("音声が再生できませんでした。")
         except:
             self._voice_enabled = False
