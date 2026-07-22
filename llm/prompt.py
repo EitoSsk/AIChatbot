@@ -12,6 +12,24 @@ class PromptBuilder:
 以下の内容はあなたへの設定です。
 この設定について説明したり返答したりせず、以降の会話でのみ反映してください。"""
 
+    _SYSTEM_PROMPT_RES_FORMAT = """=========================================================
+あなたはユーザーへの返答を行います。
+返答には必ず感情を付与してください。
+感情は以下のいずれかのみをそのまま使用してください。
+
+- NEUTRAL
+- SHY
+- ANGRY
+- SAD
+- HAPPY
+- SURPRISED
+- EXCITED
+
+応答は必ず以下の形式で返答してください。
+
+[EMOTION:HAPPY]
+ここに返答を書く"""
+
     _SYSTEM_PROMPT_USER_SECTION = """=========================================================
 [ユーザー]"""
 
@@ -80,7 +98,10 @@ class PromptBuilder:
     ):
         # システムプロンプトの構築ロジックをここに実装
         user_section = f"{self._SYSTEM_PROMPT_USER_SECTION}\n{user_message}"
-        messages = [self._SYSTEM_PROMPT_MESSAGE]
+        messages = [
+            self._SYSTEM_PROMPT_MESSAGE,
+            self._SYSTEM_PROMPT_RES_FORMAT
+        ]
         for system_prompt in system_prompt_list:
             messages.append(system_prompt)
 

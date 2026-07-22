@@ -1,5 +1,6 @@
 # Test_To_Speech機能
 
+from core.data.message import Message
 from repository.voice_repository import VoiceRepository
 from logger import Logger
 from config import Config
@@ -13,8 +14,8 @@ class TTS:
         self._logger = logger
         self._repos = VoiceRepository(config, logger)
 
-    def play(self, text: str):
-        data = self._repos.queryVoice(text)
+    def play(self, message: Message):
+        data = self._repos.queryVoice(message)
         audio.play(data)
 
     def wait(self):

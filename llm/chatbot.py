@@ -99,7 +99,7 @@ class Chatbot:
             else:
                 response = self._chat.send_message(user_input)
                 self._tts.play(response)
-                print(f"{self._config.assistant_name}: {response}")
+                print(f"{self._config.assistant_name}: {response.text}")
                 self._tts.wait()
 
     # チャットの終了処理
