@@ -8,11 +8,37 @@ import json
 import os
 
 from core.data.exception.file_exception import ConfigError, FileErrorType
+from core.data.exception.validation_exception import JsonKeysValidationError, JsonTypesValidationError, RangeValidationError, RequiredValidationError
+from utility.validation import Validation
 
 class Config:
+
+    _CONFIG_KEYS = [
+        "debug_level", 
+        "model_id", 
+        "user_name", 
+        "assistant_name", 
+        "chat_max_tokens", 
+        "chat_temperature", 
+        "chat_top_p", 
+        "history_max_tokens", 
+        "message_max_tokens"
+    ]
+    _CONFIG_TYPES = [
+        str,
+        str,
+        str,
+        str,
+        int,
+        float,
+        float,
+        int,
+        int,
+    ]
     
     def __init__(self, config_file='./data/config.json'):
         config_data = self._load_config(config_file)
+        self._validate(config_data)
 
         # キーから値を取得し、存在しない場合はデフォルト値を設定
         self.debug_level = config_data.get("debug_level", "debug")
@@ -33,3 +59,38 @@ class Config:
         except (FileNotFoundError, PermissionError) as e:
             raise ConfigError(FileErrorType.READ.value)
         
+    def _validate(self, config_data: dict):
+        # キーチェック
+        for key in self._CONFIG_KEYS:
+            try:
+                Validation.key(config_data, key)
+            except JsonKeysValidationError as  e:
+                self._logger.error(e)
+                raise e
+                
+        # 型チェック
+        try:
+            for config, type in zip(config_data.values(), self._CONFIG_TYPES):
+                Validation.types(config, type)
+        except JsonTypesValidationError as  e:
+            self._logger.error(e)
+            raise e
+        
+        # 必須チェック
+        try:
+            Validation.required("model_id", config_data["model_id"])
+            Validation.required("chat_max_tokens", config_data["chat_max_tokens"])
+            Validation.required("message_max_tokens", config_data["message_max_tokens"])
+            Validation.required("history_max_tokens", config_data["history_max_tokens"])
+        except RequiredValidationError as  e:
+            self._logger.error(e)
+            raise e
+
+        # 範囲チェック
+        try:
+            Validation.range("chat_temperature", config_data["chat_temperature"], (0.0, 2.0))
+            Validation.range("chat_top_p", config_data["chat_top_p"], (0.0, 1.0))
+        except RangeValidationError as  e:
+            self._logger.error(e)
+            raise e
+    

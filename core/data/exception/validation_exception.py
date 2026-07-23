@@ -22,6 +22,13 @@ class RangeValidationError(ApplicationException):
             f"バリデーションエラー: {self.args}"
         )
     
+class RequiredValidationError(ApplicationException):
+
+    def __str__(self):
+        return (
+            f"バリデーションエラー: {self.args}"
+        )
+    
 class ValidationOtherError(ApplicationException):
 
     def __str__(self):

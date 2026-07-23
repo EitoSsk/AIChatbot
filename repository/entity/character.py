@@ -63,7 +63,7 @@ class Character:
                 Validation.types(section["items"], list)
                 for item in section["items"]:
                     Validation.types(item, str)
-        except JsonKeysValidationError as  e:
+        except JsonTypesValidationError as  e:
             self._logger.error(e)
             raise e
 
