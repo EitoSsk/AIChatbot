@@ -39,6 +39,7 @@ class Character:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise CharacterError(FileErrorType.READ.value)
         
     def _validate(self):

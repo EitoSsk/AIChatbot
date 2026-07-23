@@ -30,17 +30,21 @@ class TTS:
         try:
             data = self._voice_repository.queryVoice(message, voice_setting)
             audio.play(data)
-        except VoiceEngineNotRunningError:
+        except VoiceEngineNotRunningError as e:
+            self._logger.error(e)
+            self._logger.warning("VOICEVOXエンジンを起動されていないか、接続できない状況です。")
             self._voice_enabled = False
-            self._logger.debug("VOICEVOXエンジンを起動されていないか、接続できない状況です。")
-        except VoiceTimeoutError:
-            self._logger.debug("VOICEVOXエンジンとの通信がタイムアウトしました。")
-        except (VoicePlaybackError, VoiceNetworkError):
+        except VoiceTimeoutError as e:
+            self._logger.error(e)
+            self._logger.warning("VOICEVOXエンジンとの通信がタイムアウトしました。")
+        except (VoicePlaybackError, VoiceNetworkError) as e:
+            self._logger.error(e)
+            self._logger.warning("音声が再生できませんでした。")
             self._voice_enabled = False
-            self._logger.debug("音声が再生できませんでした。")
-        except:
+        except Exception as e:
+            self._logger.error(e)
+            self._logger.warning("音声が再生できませんでした。")
             self._voice_enabled = False
-            self._logger.debug("音声が再生できませんでした。")
 
     def wait(self):
         if not self._voice_enabled:
@@ -48,6 +52,7 @@ class TTS:
 
         try:
             audio.wait()
-        except:
-            self._logger.debug("音声の停止に失敗しました。")
+        except Exception as e:
+            self._logger.error(e)
+            self._logger.warning("音声の停止に失敗しました。")
         

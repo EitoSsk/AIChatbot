@@ -57,6 +57,7 @@ class Config:
                 config_data = json.load(f)
             return config_data
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise ConfigError(FileErrorType.READ.value)
         
     def _validate(self, config_data: dict):

@@ -117,6 +117,7 @@ AI自身の目標は記載しないでください。
             with open(self._MEMORY_FILE, 'r', encoding='utf-8') as f:
                 self._memory_data = json.load(f)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise MemoryError(FileErrorType.READ.value)
 
 
@@ -152,4 +153,5 @@ AI自身の目標は記載しないでください。
             with open(self._MEMORY_FILE, 'w', encoding='utf-8') as f:
                 json.dump(memory, f, ensure_ascii=False, indent=4)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise MemoryError(FileErrorType.SAVE.value)

@@ -64,6 +64,7 @@ class History:
             with open(self._history_file, 'r', encoding='utf-8') as f:
                 self._all_history = json.load(f)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise HistoryError(FileErrorType.READ.value)
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
@@ -77,6 +78,7 @@ class History:
         try:
             self._save_history()
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise HistoryError(FileErrorType.SAVE.value)
         
         self._logger.debug(
@@ -113,6 +115,7 @@ History Name: {self._history_file}
             with open(file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise HistoryError(FileErrorType.READ.value)
 
     # 履歴を保存するメソッド

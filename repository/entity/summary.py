@@ -121,6 +121,7 @@ class Summary:
             with open(file, 'r', encoding='utf-8') as f:
                 self._summary_data = json.load(f)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise SummaryError(FileErrorType.READ.value)
 
 
@@ -172,4 +173,5 @@ Summary Tokens: {response_tokens_count}
             with open(self._summary_file, 'w', encoding='utf-8') as f:
                 json.dump(summary, f, ensure_ascii=False, indent=4)
         except (FileNotFoundError, PermissionError) as e:
+            self._logger.error(e)
             raise SummaryError(FileErrorType.SAVE.value)

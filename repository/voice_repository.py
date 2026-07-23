@@ -2,7 +2,6 @@
 # 音声データを作成する機能を提供する
 
 import requests
-from core.data.exception.network_exception import NetworkError
 from core.data.exception.voice_exception import VoiceEngineNotRunningError, VoiceNetworkError, VoiceTimeoutError
 from core.data.response import Response
 from core.data.emotion import Emotion

@@ -1,6 +1,5 @@
 # HTTPクライアントクラス
 
-from core.data.exception.network_exception import NetworkError
 from logger import Logger
 import requests
 from config import Config
