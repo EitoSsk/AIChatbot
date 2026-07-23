@@ -34,4 +34,4 @@ class CharacterRepository:
         return "\n".join(prompt)
     
     def get_voice(self):
-        return self._character._voive
+        return self._character._voice

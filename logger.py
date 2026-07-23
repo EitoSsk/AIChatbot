@@ -7,13 +7,16 @@ class Logger:
 
     def debug(self, message: str):
         if not self._debug_level == "debug": return
-        print(message)
+        print(f"[DEBUG] {message}")
 
     def info(self, message: str):
-        print(message)
+        print(f"[INFO] {message}")
 
     def warning(self, message: str):
-        print(message)
+        print(f"[WARNING] {message}")
 
     def error(self, message: str):
-        print(message)
+        print(f"[ERROR] {message}")
+
+    def error(self, e: Exception):
+        print(f"[ERROR] {e}")
