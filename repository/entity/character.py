@@ -11,7 +11,7 @@ from utility.validation import Validation
 
 class Character:
 
-    _CHARACTER_KEYS = ["name", "sections"]
+    _CHARACTER_KEYS = ["name", "role", "sections"]
     _CHARACTER_SECTIONS_KEYS = ["title", "items"]
     _VOICE_KEYS = ["neutral", "shy", "sad", "angry", "happy", "surprised", "excited"]
     _VOICE_DEFAULT = {
@@ -30,6 +30,7 @@ class Character:
         self._validate()
 
         self._name = self._character_data["name"]
+        self._role = self._character_data["role"]
         self._sections: dict = self._character_data["sections"]
         self._voice: dict = self._voice_data["voice"]
 
@@ -58,6 +59,7 @@ class Character:
         # 型チェック
         try:
             Validation.types(self._character_data["name"], str)
+            Validation.types(self._character_data["role"], str)
             Validation.types(self._character_data["sections"], list)
             for section in self._character_data["sections"]:
                 Validation.types(section["title"], str)

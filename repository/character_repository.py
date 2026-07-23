@@ -27,7 +27,8 @@ class CharacterRepository:
 
         prompt = [
             "=========================================================",
-            f"あなたは「{self._character._character_data['name']}」というAIアシスタントです。",
+            f"あなたは「{self._character._name}」という名前のAIです。",
+            self._character._role,
             sections_str,
         ]
 
