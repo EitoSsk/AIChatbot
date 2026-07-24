@@ -53,6 +53,6 @@
     },
     {
         "role": "assistant",
-        "content": "[EMOTION:NEUTRAL]\nこんにちは。今日はどんなことを話そうか。"
+        "content": "[EMOTION:NEUTRAL]\nこんにちは。今日はどんなことを話したい？"
     }
 ]

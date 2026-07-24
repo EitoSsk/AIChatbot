@@ -25,10 +25,13 @@ from datetime import datetime
 import os
 import json
 from core.data.exception.file_exception import FileErrorType, HistoryError
+from pathlib import Path
+import shutil
 
 class History:
 
     _HISTORY_DIR = "./data/history/"
+    _SEED_FILE = "./data/conversation_seed.json"
 
     def __init__(self, config, tokenizer, logger):
         self._config = config
@@ -55,9 +58,10 @@ class History:
         if not os.path.exists(self._history_file):
             if not os.path.exists(self._HISTORY_DIR):
                 os.makedirs(self._HISTORY_DIR, exist_ok=True)
-            with open(self._history_file, 'w', encoding='utf-8') as f:
-                json.dump([], f, ensure_ascii=False, indent=4)
-            return []
+            seed_file = Path(self._SEED_FILE)
+            history_file = Path(self._history_file)
+            history_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(seed_file, history_file)
         
         try:
             self._discard_history()
