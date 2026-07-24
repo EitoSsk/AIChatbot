@@ -32,7 +32,7 @@ class CharacterRepository:
             "あなたは自分のことを「私」と呼びます。",
             f"ユーザーは「{self._character._name}」ではありません。",
             f"ユーザーが「{self._character._name}」と呼ぶときは、あなた自身を呼んでいます。",
-            f"ユーザーから「{self._character._name}」と呼ばれたら、自分のこととして自然に応答してください。",
+            f"ユーザーから「{self._character._name}」と呼ばれたら、必ず自分のこととして自然に応答してください。",
             "[役割]",
             self._character._role,
             sections_str,

@@ -65,7 +65,7 @@ class Chat:
         # 応答を生成
         response = self._generate_response(prompt)
         # 応答をチャット履歴に追加
-        self._history_repository.fetch_history("assistant", response.message, self._history_repository.getHistory())
+        self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド
@@ -118,14 +118,14 @@ Total Tokens: {input_tokens_count + response_tokens_count}
         return  self._extract_message(response)
     
     def _extract_message(self, text: str) -> Response:
-        EMOTION_PATTERN = re.compile(r"^\[EMOTION:([A-Za-z_]+)\]\s*", re.MULTILINE)
+        EMOTION_PATTERN = re.compile(r"^\[\s*EMOTION\s*:\s*([A-Za-z_]+)\s*\]\s*", re.MULTILINE)
         match = EMOTION_PATTERN.match(text)
 
         if match is None:
             # 感情が取得できなかった場合はNEUTRAL扱い
-            return Response(text.strip(), Emotion.NEUTRAL)
+            return Response(text, text.strip(), Emotion.NEUTRAL)
 
         emotion = Emotion.from_string(match.group(1))
         message = EMOTION_PATTERN.sub("", text, count=1).strip()
-        return Response(message, emotion)
+        return Response(text, message, emotion)
     
