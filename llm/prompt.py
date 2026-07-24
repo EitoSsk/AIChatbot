@@ -25,10 +25,14 @@ class PromptBuilder:
 - SURPRISED
 - EXCITED
 
-応答は必ず以下の形式で返答してください。
+以下は応答例です。
+
+[EMOTION:NEUTRAL]
+今日はいい天気だね。
 
 [EMOTION:HAPPY]
-ここに返答を書く"""
+今日は楽しい一日だったね。
+"""
 
     _SYSTEM_PROMPT_USER_SECTION = """=========================================================
 [ユーザー]"""
