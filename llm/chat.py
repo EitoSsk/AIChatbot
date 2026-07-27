@@ -4,6 +4,7 @@
 #チャット履歴の更新
 #応答返却
 
+from core.data.exception.validation_exception import ResponseEmptyError
 from core.data.response import Response
 import re
 from core.data.emotion import Emotion
@@ -15,6 +16,7 @@ from config import Config
 from logger import Logger
 from repository.history_repository import HistoryRepository
 from llm.prompt import PromptBuilder
+from utility.validation import LLMResponseValidation
 
 class Chat:
 
@@ -59,13 +61,20 @@ class Chat:
             self._system_prompt_list
         )
 
-        # 履歴の更新（システムプロンプトは含めない）
-        self._history_repository.fetch_history("user", message, trimed_history)
-
         # 応答を生成
-        response = self._generate_response(prompt)
-        # 応答をチャット履歴に追加
+        try:
+            response = self._generate_response(prompt)
+        except ResponseEmptyError as e:
+            # TODO: 応答生成のリトライ
+            self._logger.error(e)
+            raise e
+
+        # 履歴の更新
+        # ユーザーはシステムプロンプトを含めない
+        # 応答は原文を履歴にs追加
+        self._history_repository.fetch_history("user", message, trimed_history)
         self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
+
         return response
 
     # インプットから応答を生成するメソッド
@@ -114,8 +123,14 @@ Total Tokens: {input_tokens_count + response_tokens_count}
 """
         )
 
-        # 感情とメッセージに分解
-        return  self._extract_message(response)
+        # 応答のバリデーション
+        has_emotion, message = LLMResponseValidation.validate(response)
+        if has_emotion:
+            # 感情とメッセージに分解  
+            return self._extract_message(response)
+        else:
+            # 本文のみの場合は感情タグを補完する
+            return f"[EMOTION:NEUTRAL]\n{message}"
     
     def _extract_message(self, text: str) -> Response:
         EMOTION_PATTERN = re.compile(r"^\[\s*EMOTION\s*:\s*([A-Za-z_]+)\s*\]\s*", re.MULTILINE)

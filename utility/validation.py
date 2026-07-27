@@ -1,7 +1,8 @@
 # バリデーション機能
 
+import re
 from typing import Any
-from core.data.exception.validation_exception import JsonKeysValidationError, JsonTypesValidationError, RangeValidationError, RequiredValidationError, ValidationOtherError
+from core.data.exception.validation_exception import JsonKeysValidationError, JsonTypesValidationError, RangeValidationError, RequiredValidationError, ResponseEmptyError, ValidationOtherError
 
 class Validation:
 
@@ -36,4 +37,31 @@ class Validation:
             raise RequiredValidationError(f"「{name}」は必須です。")
         elif isinstance(value, int) and not value > 0:
             raise RequiredValidationError(f"「{name}」は必須です。")
+
+class LLMResponseValidation:
+
+    @staticmethod
+    def validate(response: str | None) -> tuple:
+
+        if response is None:
+            raise ResponseEmptyError("応答メッセージがありません。")
+
+        response = response.strip()
+
+        if response == "":
+            raise ResponseEmptyError("応答メッセージがありません。")
+
+        EMOTION_PATTERN = re.compile(r"^\[\s*EMOTION\s*:\s*([A-Za-z_]+)\s*\]\s*", re.MULTILINE)
+        match = EMOTION_PATTERN.search(response)
+        has_emotion = match is not None
+
+        if has_emotion:
+            message = response[match.end():].strip()
+        else:
+            message = response.strip()
+
+        if not len(message) > 0:
+            raise ResponseEmptyError("応答メッセージがありません。")
+
+        return has_emotion, message
         

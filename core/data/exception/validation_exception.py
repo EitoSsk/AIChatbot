@@ -35,3 +35,10 @@ class ValidationOtherError(ApplicationException):
         return (
             f"バリデーションエラー: {self.args}"
         )
+
+class ResponseEmptyError(ApplicationException):
+
+    def __str__(self):
+        return (
+            f"バリデーションエラー: {self.args}"
+        )
