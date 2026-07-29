@@ -56,13 +56,8 @@ class History:
     # message_max_tokensの数だけ、直近のメッセージを取得する
     def load_history(self):
         if not os.path.exists(self._history_file):
-            if not os.path.exists(self._HISTORY_DIR):
-                os.makedirs(self._HISTORY_DIR, exist_ok=True)
-            seed_file = Path(self._SEED_FILE)
-            history_file = Path(self._history_file)
-            history_file.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(seed_file, history_file)
-        
+            self._create_new_history()
+
         try:
             self._discard_history()
             with open(self._history_file, 'r', encoding='utf-8') as f:
@@ -121,6 +116,35 @@ History Name: {self._history_file}
         except (FileNotFoundError, PermissionError) as e:
             self._logger.error(e)
             raise HistoryError(FileErrorType.READ.value)
+
+    def _create_new_history(self):
+        if not os.path.exists(self._HISTORY_DIR):
+            os.makedirs(self._HISTORY_DIR, exist_ok=True)
+        
+        history_dir = Path(self._HISTORY_DIR)
+        history_files = sorted(history_dir.glob("*.json"))
+
+        if len(history_files) > 0:
+            file = history_files[-1]
+            if not file.exists():
+                self._create_new_history_from_seed()
+                return
+                    
+            try:
+                with file.open('r', encoding='utf-8') as f:
+                    data = json.load(f)
+                with open(self._history_file, 'w', encoding='utf-8') as f:
+                    json.dump(data[-10:], f, ensure_ascii=False, indent=4)
+            except:
+                self._create_new_history_from_seed()
+        else:
+            self._create_new_history_from_seed()
+
+    def _create_new_history_from_seed(self):
+        seed_file = Path(self._SEED_FILE)
+        history_file = Path(self._history_file)
+        history_file.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(seed_file, history_file)
 
     # 履歴を保存するメソッド
     def _save_history(self):
