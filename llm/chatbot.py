@@ -3,6 +3,7 @@
 # チャットはループで行われ、ユーザーの入力を受け取り、モデルに渡して応答を生成します。
 # チャット機能自体はllm/chat.pyが担当します。
 
+from core.data.exception.validation_exception import ResponseEmptyError
 from llm.chat import Chat
 from repository.character_repository import CharacterRepository
 from speech.tts import TTS
@@ -104,10 +105,13 @@ class Chatbot:
             if not user_input.strip():
                 continue
             else:
-                response = self._chat.send_message(user_input)
-                self._tts.play(response)
-                print(f"{self._config.assistant_name}: {response.message}")
-                self._tts.wait()
+                try: 
+                    response = self._chat.send_message(user_input)
+                    self._tts.play(response)
+                    print(f"{self._config.assistant_name}: {response.message}")
+                    self._tts.wait()
+                except ResponseEmptyError:
+                    print("ごめんね。うまく返答を生成できなかったみたい。もう一度試してくれる？")
 
     # チャットの終了処理
     def _close_chat(self):

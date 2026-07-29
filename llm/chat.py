@@ -62,12 +62,16 @@ class Chat:
         )
 
         # 応答を生成
-        try:
-            response = self._generate_response(prompt)
-        except ResponseEmptyError as e:
-            # TODO: 応答生成のリトライ
-            self._logger.error(e)
-            raise e
+        count = 0
+        while True:
+            count += 1
+            try:
+                response = self._generate_response(prompt)
+                break
+            except ResponseEmptyError as e:
+                if count > 1:
+                    self._logger.error(e)
+                    raise e
 
         # 履歴の更新
         # ユーザーはシステムプロンプトを含めない
