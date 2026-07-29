@@ -27,7 +27,7 @@ class Chatbot:
         self._tokenizer = AutoTokenizer.from_pretrained(model_id)
         self._model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            torch_dtype=torch.float16,
+            torch_dtype=torch.bfloat16,
             device_map="auto"
         )
         self._history_repository = HistoryRepository(config, self._tokenizer, logger)
