@@ -1,6 +1,6 @@
 {
     "debug_level": "debug",
-    "model_id": "google/gemma-3-1B-it",
+    "model_id": "./model/gguf/gemma-3-4b-it-q4_0.gguf",
     "user_name": "ユーザー",
     "assistant_name": "アシスタント",
     "chat_max_tokens": 256,

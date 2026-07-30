@@ -103,7 +103,7 @@ class Chatbot:
                 try: 
                     response = self._chat.send_message(user_input)
                     self._tts.play(response)
-                    print(f"{self._config.assistant_name}: {response}")
+                    print(f"{self._config.assistant_name}: {response.message}")
                     self._tts.wait()
                 except ResponseEmptyError:
                     print("ごめんね。うまく返答を生成できなかったみたい。もう一度試してくれる？")

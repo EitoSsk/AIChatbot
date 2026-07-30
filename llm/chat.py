@@ -59,17 +59,26 @@ class Chat:
         #     self._system_prompt_list
         # )
 
-        # # 応答を生成
-        # count = 0
-        # while True:
-        #     count += 1
-        #     try:
-        #         response = self._generate_response(prompt)
-        #         break
-        #     except ResponseEmptyError as e:
-        #         if count > 1:
-        #             self._logger.error(e)
-        #             raise e
+        # 応答を生成
+        count = 0
+        while True:
+            count += 1
+            try:
+                res = self._model.generate_response(
+                    message, 
+                    self._history_repository.getHistory(), 
+                    self._system_prompt_list
+                )
+                has_emotion, text = LLMResponseValidation.validate(res)
+                if has_emotion:
+                    response = self._extract_message(res)
+                else:
+                    response = self._extract_message(f"[EMOTION:NEUTRAL]\n{text}")
+                break
+            except ResponseEmptyError as e:
+                if count > 1:
+                    self._logger.error(e)
+                    raise e
 
         # # 履歴の更新
         # # ユーザーはシステムプロンプトを含めない
@@ -77,9 +86,8 @@ class Chat:
         # self._history_repository.fetch_history("user", message, trimed_history)
         # self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
 
-        response = self._model.generate_response(message, self._history_repository.getHistory(), self._system_prompt_list)
         self._history_repository.fetch_history("user", message, self._history_repository.getHistory())
-        self._history_repository.fetch_history("assistant", response, self._history_repository.getHistory())
+        self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド
@@ -135,7 +143,7 @@ Total Tokens: {input_tokens_count + response_tokens_count}
             return self._extract_message(response)
         else:
             # 本文のみの場合は感情タグを補完する
-            return f"[EMOTION:NEUTRAL]\n{message}"
+            return self._extract_message(f"[EMOTION:NEUTRAL]\n{message}")
     
     def _extract_message(self, text: str) -> Response:
         EMOTION_PATTERN = re.compile(r"^\[\s*EMOTION\s*:\s*([A-Za-z_]+)\s*\]\s*", re.MULTILINE)

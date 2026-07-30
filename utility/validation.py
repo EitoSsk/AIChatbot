@@ -41,7 +41,7 @@ class Validation:
 class LLMResponseValidation:
 
     @staticmethod
-    def validate(response: str | None) -> tuple:
+    def validate(response: str) -> tuple:
 
         if response is None:
             raise ResponseEmptyError("応答メッセージがありません。")
