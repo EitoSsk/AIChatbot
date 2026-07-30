@@ -33,11 +33,10 @@ class History:
     _HISTORY_DIR = "./data/history/"
     _SEED_FILE = "./data/conversation_seed.json"
 
-    def __init__(self, config, tokenizer, logger):
+    def __init__(self, config, logger):
         self._config = config
         date = datetime.now().strftime("%Y-%m")
         self._history_file = f'{self._HISTORY_DIR}{date}.json'
-        self._tokenizer = tokenizer
         self._logger = logger
         self._all_history = []
 
@@ -88,20 +87,6 @@ Total Historys: {len(self._all_history)}
 History Name: {self._history_file}
 """
         )
-        
-    # 履歴のトークン数取得
-    def getAllHistoryTokens(self):
-        if self._all_history == []:
-            return 0
-
-        # トークナイズ
-        tokens = self._tokenizer.apply_chat_template(
-            self._all_history,
-            tokenize=True,
-            return_tensors="pt",
-            add_generation_prompt=True,
-        )
-        return tokens["input_ids"].shape[-1]
     
     # 日付指定で履歴を取得する(yyyy-MM)
     def getHistoryFromDate(self, datetime):

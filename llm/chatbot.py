@@ -4,6 +4,7 @@
 # チャット機能自体はllm/chat.pyが担当します。
 
 from core.data.exception.validation_exception import ResponseEmptyError
+from core.llm.gguf_llm import GGUF_LLM
 from llm.chat import Chat
 from repository.character_repository import CharacterRepository
 from speech.tts import TTS
@@ -24,20 +25,15 @@ class Chatbot:
         self._config = config
         self._logger = logger
         model_id = self._config.model_id
-        self._tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self._model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            torch_dtype=torch.bfloat16,
-            device_map="auto"
-        )
-        self._history_repository = HistoryRepository(config, self._tokenizer, logger)
+        self._model = GGUF_LLM(model_id, self._config, self._logger)
+        self._history_repository = HistoryRepository(config, logger)
         self._summary_repository = SummaryRepository(config, logger)
         self._memory_repository = MemoryRepository(config, logger)
         self._character_repository = CharacterRepository(config, logger)
         self._load_history_usecase = LoadHistoryUseCase(
             self._config,
             self._logger,
-            self._tokenizer,
+            self._model,
             self._history_repository
         )
         self._create_summary_usecase = CreateSummaryUseCase(
@@ -54,7 +50,6 @@ class Chatbot:
         )
         self._chat = Chat(
             self._model, 
-            self._tokenizer, 
             self._history_repository, 
             self._summary_repository, 
             self._memory_repository,
@@ -73,9 +68,9 @@ class Chatbot:
         # 履歴のロード
         self._load_history_usecase.execute()
         # 要約・長期記憶を作成する
-        canCreateMemory = self._create_summary_usecase.execute(self._model, self._tokenizer)
-        if canCreateMemory:
-            self._create_memory_usecase.execute(self._model, self._tokenizer)
+        # canCreateMemory = self._create_summary_usecase.execute(self._model, self._tokenizer)
+        # if canCreateMemory:
+        #     self._create_memory_usecase.execute(self._model, self._tokenizer)
 
         # チャットを開始する
         self._chat_loop()
@@ -108,7 +103,7 @@ class Chatbot:
                 try: 
                     response = self._chat.send_message(user_input)
                     self._tts.play(response)
-                    print(f"{self._config.assistant_name}: {response.message}")
+                    print(f"{self._config.assistant_name}: {response}")
                     self._tts.wait()
                 except ResponseEmptyError:
                     print("ごめんね。うまく返答を生成できなかったみたい。もう一度試してくれる？")

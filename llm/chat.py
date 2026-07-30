@@ -24,7 +24,6 @@ class Chat:
     def __init__(
         self, 
         model, 
-        tokenizer, 
         history_repository: HistoryRepository, 
         summary_repository: SummaryRepository,
         memory_repository: MemoryRepository,  
@@ -33,7 +32,6 @@ class Chat:
         logger: Logger
     ):
         self._model = model
-        self._tokenizer = tokenizer
         self._config = config
         self._logger = logger
         self._history_repository = history_repository
@@ -50,35 +48,38 @@ class Chat:
     # レスポンスを返却する
     def send_message(self, message):
         # PromptBuilderを使用して、履歴からプロンプトを構築
-        prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
-        trimed_history = prompt_builder.trim_history_by_tokens(
-            self._history_repository.getHistory(), 
-            message,
-            self._system_prompt_list
-        )
-        prompt = prompt_builder.build_prompt(
-            trimed_history, message,
-            self._system_prompt_list
-        )
+        # prompt_builder = PromptBuilder(self._config, self._tokenizer, self._logger)
+        # trimed_history = prompt_builder.trim_history_by_tokens(
+        #     self._history_repository.getHistory(), 
+        #     message,
+        #     self._system_prompt_list
+        # )
+        # prompt = prompt_builder.build_prompt(
+        #     trimed_history, message,
+        #     self._system_prompt_list
+        # )
 
-        # 応答を生成
-        count = 0
-        while True:
-            count += 1
-            try:
-                response = self._generate_response(prompt)
-                break
-            except ResponseEmptyError as e:
-                if count > 1:
-                    self._logger.error(e)
-                    raise e
+        # # 応答を生成
+        # count = 0
+        # while True:
+        #     count += 1
+        #     try:
+        #         response = self._generate_response(prompt)
+        #         break
+        #     except ResponseEmptyError as e:
+        #         if count > 1:
+        #             self._logger.error(e)
+        #             raise e
 
-        # 履歴の更新
-        # ユーザーはシステムプロンプトを含めない
-        # 応答は原文を履歴にs追加
-        self._history_repository.fetch_history("user", message, trimed_history)
-        self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
+        # # 履歴の更新
+        # # ユーザーはシステムプロンプトを含めない
+        # # 応答は原文を履歴にs追加
+        # self._history_repository.fetch_history("user", message, trimed_history)
+        # self._history_repository.fetch_history("assistant", response.plane_text, self._history_repository.getHistory())
 
+        response = self._model.generate_response(message, self._history_repository.getHistory(), self._system_prompt_list)
+        self._history_repository.fetch_history("user", message, self._history_repository.getHistory())
+        self._history_repository.fetch_history("assistant", response, self._history_repository.getHistory())
         return response
 
     # インプットから応答を生成するメソッド

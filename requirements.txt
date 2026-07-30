@@ -8,3 +8,4 @@ tokenizers
 requests
 sounddevice
 numpy
+llama_cpp

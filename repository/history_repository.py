@@ -6,10 +6,10 @@ from repository.entity.history import History
 class HistoryRepository:
 
     # コンストラクタ
-    def __init__(self, config, logger, tokenizer):
+    def __init__(self, config, logger):
         self._config = config
         self._logger = logger
-        self._history = History(config, logger, tokenizer)
+        self._history = History(config, logger)
 
     def getHistory(self):
         return self._history.getHistory()
@@ -27,7 +27,7 @@ class HistoryRepository:
         self._history.fetch_history(role, content, history)
         
     def getAllHistoryTokens(self):
-        return self._history.getAllHistoryTokens()
+        return 0
     
     def getHistoryFromDate(self, datetime):
         return self._history.getHistoryFromDate(datetime)
