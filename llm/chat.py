@@ -20,6 +20,28 @@ from utility.validation import LLMResponseValidation
 
 class Chat:
 
+    _SYSTEM_PROMPT_RES_FORMAT = """=========================================================
+あなたはユーザーへの返答を行います。
+返答には必ず感情を付与してください。
+感情は以下のいずれかのみをそのまま使用してください。
+
+- NEUTRAL
+- SHY
+- ANGRY
+- SAD
+- HAPPY
+- SURPRISED
+- EXCITED
+
+以下は応答例です。
+
+[EMOTION:NEUTRAL]
+今日はいい天気だね。
+
+[EMOTION:HAPPY]
+今日は楽しい一日だったね。
+"""
+
     # コンストラクタ
     def __init__(
         self, 
@@ -41,7 +63,8 @@ class Chat:
         self._system_prompt_list = [
             self._character_repository.build_prompt(),
             self._summary_repository.build_prompt(),
-            self._memory_repository.build_prompt()
+            self._memory_repository.build_prompt(),
+            self._SYSTEM_PROMPT_RES_FORMAT
         ]
 
     # メッセージを送信するメソッド

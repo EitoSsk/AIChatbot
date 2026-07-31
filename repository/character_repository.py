@@ -15,7 +15,7 @@ class CharacterRepository:
     def build_prompt(self):
         sections = []
         for section in self._character._character_data["sections"]:
-            title = f"#{section['title']}"
+            title = f"[{section['title']}]"
             items = []
             for item in section['items']:
                 items.append(f"・{item}")
@@ -27,6 +27,7 @@ class CharacterRepository:
 
         prompt = [
             "=========================================================",
+            "以下はあなたの情報です。以下の情報をもとにロールプレイしてください。",
             "[名前]",
             f"あなたは「{self._character._name}」という名前のAIです。",
             "あなたは自分のことを「私」と呼びます。",
