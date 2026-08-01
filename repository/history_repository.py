@@ -23,11 +23,15 @@ class HistoryRepository:
     def load_history(self):
         self._history.load_history()
 
-    def fetch_history(self, role, content, history: list):
-        self._history.fetch_history(role, content, history)
+    def fetch_history(self, role, content, tokens, trimed_history: list):
+        self._history.fetch_history(role, content, tokens, trimed_history)
         
     def getAllHistoryTokens(self):
-        return 0
+        all = self._history.getAllHistory()
+        total_tokens = 0
+        for h in all:
+            total_tokens += h["tokens"]
+        return total_tokens
     
     def getHistoryFromDate(self, datetime):
         return self._history.getHistoryFromDate(datetime)

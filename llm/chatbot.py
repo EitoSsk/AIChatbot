@@ -8,8 +8,6 @@ from core.llm.gguf_llm import GGUF_LLM
 from llm.chat import Chat
 from repository.character_repository import CharacterRepository
 from speech.tts import TTS
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
 from repository.history_repository import HistoryRepository
 from repository.memory_repository import MemoryRepository
 from repository.summary_repository import SummaryRepository
@@ -34,7 +32,10 @@ class Chatbot:
             self._config,
             self._logger,
             self._model,
-            self._history_repository
+            self._history_repository, 
+            self._summary_repository, 
+            self._memory_repository,
+            self._character_repository,
         )
         self._create_summary_usecase = CreateSummaryUseCase(
             self._summary_repository,
@@ -67,7 +68,7 @@ class Chatbot:
     def start_chat(self):
         # 履歴のロード
         self._load_history_usecase.execute()
-        # 要約・長期記憶を作成する
+        # TODO: 要約・長期記憶を作成する
         # canCreateMemory = self._create_summary_usecase.execute(self._model, self._tokenizer)
         # if canCreateMemory:
         #     self._create_memory_usecase.execute(self._model, self._tokenizer)

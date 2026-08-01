@@ -67,9 +67,9 @@ class History:
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
-    def fetch_history(self, role, content, history: list):
-        self._history = history.copy()
-        new = {'role': role, 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    def fetch_history(self, role, content, tokens, trimed_history: list):
+        self._history = trimed_history.copy()
+        new = {'role': role, 'content': content, 'tokens': tokens, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self._history.append(new)
         self._all_history.append(new)
 

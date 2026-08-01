@@ -12,7 +12,7 @@ class GGUF_LLM:
     def load_model(self, model_id: str):
         self._model = Llama(
             model_path=model_id,
-            n_ctx=8192,
+            n_ctx=self._config.history_max_tokens,
             # n_gpu_layers=-1,
             verbose=False
         )
@@ -42,5 +42,30 @@ class GGUF_LLM:
         )
         return response["choices"][-1]["message"]["content"]
             
-    def trim_prompt(self, prompt: list, history: list):
-       pass
+    def trim_history(self, message: str, history: list, system_prompt_list: list):
+        if not len(history) > 0:
+            return history.copy()
+
+        total_tokens = 0
+        system_message = "\n".join(system_prompt_list)
+        total_tokens += len(self._model.tokenize(message.encode("utf-8")))
+        total_tokens += len(self._model.tokenize(system_message.encode("utf-8")))
+        total_tokens += self._config.chat_template_overhead
+        for h in history:
+            total_tokens += h["tokens"]
+
+        if total_tokens <= self._config.history_max_tokens:
+            return history.copy()
+
+        trimed_history = history.copy()
+        while total_tokens > self._config.history_max_tokens and len(history) > 0:
+            removed = trimed_history[2:]
+            for r in removed:
+                total_tokens -= r["tokens"]
+            
+            del trimed_history[:2]
+
+        return trimed_history
+
+    def count_tokens(self, message: str):
+        return len(self._model.tokenize(message.encode("utf-8")))

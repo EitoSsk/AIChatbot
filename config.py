@@ -22,6 +22,7 @@ class Config:
         "chat_temperature", 
         "chat_top_p", 
         "history_max_tokens", 
+        "chat_template_overhead", 
         "message_max_tokens"
     ]
     _CONFIG_TYPES = [
@@ -32,6 +33,7 @@ class Config:
         int,
         float,
         float,
+        int,
         int,
         int,
     ]
@@ -48,7 +50,8 @@ class Config:
         self.chat_max_tokens = config_data.get("chat_max_tokens", 256)
         self.chat_temperature = config_data.get("chat_temperature", 0.7)
         self.chat_top_p = config_data.get("chat_top_p", 0.9)
-        self.history_max_tokens = config_data.get("history_max_tokens", 25)
+        self.history_max_tokens = config_data.get("history_max_tokens", 8192)
+        self.chat_template_overhead = config_data.get("chat_template_overhead", 520)
         self.message_max_tokens = config_data.get("message_max_tokens", 30)
 
     def _load_config(self, config_file):
@@ -82,6 +85,7 @@ class Config:
             Validation.required("model_id", config_data["model_id"])
             Validation.required("chat_max_tokens", config_data["chat_max_tokens"])
             Validation.required("message_max_tokens", config_data["message_max_tokens"])
+            Validation.required("chat_template_overhead", config_data["chat_template_overhead"])
             Validation.required("history_max_tokens", config_data["history_max_tokens"])
         except RequiredValidationError as  e:
             self._logger.error(e)
