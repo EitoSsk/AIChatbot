@@ -16,6 +16,7 @@ from logger import Logger
 from repository.history_repository import HistoryRepository
 from usecase.create_system_prompt_usecase import CreateSystemPromptUseCase
 from utility.validation import LLMResponseValidation
+from utility.formatter import ResponseFormatter
 
 class Chat:
 
@@ -101,4 +102,7 @@ class Chat:
 
         emotion = Emotion.from_string(match.group(1))
         message = EMOTION_PATTERN.sub("", text, count=1).strip()
-        return Response(text, message, emotion)
+        message = ResponseFormatter.format(message)
+        plane_text = f"[EMOTION:{emotion.name}]\n{message}"
+
+        return Response(plane_text, message, emotion)

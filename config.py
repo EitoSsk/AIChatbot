@@ -21,6 +21,7 @@ class Config:
         "chat_max_tokens", 
         "chat_temperature", 
         "chat_top_p", 
+        "chat_top_k", 
         "history_max_tokens", 
         "chat_template_overhead", 
         "message_max_tokens"
@@ -36,6 +37,7 @@ class Config:
         int,
         int,
         int,
+        int,
     ]
     
     def __init__(self, config_file='./data/config.json'):
@@ -48,8 +50,9 @@ class Config:
         self.user_name = config_data.get("user_name", "ユーザー")
         self.assistant_name = config_data.get("assistant_name", "アシスタント")
         self.chat_max_tokens = config_data.get("chat_max_tokens", 256)
-        self.chat_temperature = config_data.get("chat_temperature", 0.7)
-        self.chat_top_p = config_data.get("chat_top_p", 0.9)
+        self.chat_temperature = config_data.get("chat_temperature", 1.0)
+        self.chat_top_p = config_data.get("chat_top_p", 0.95)
+        self.chat_top_k = config_data.get("chat_top_k", 64)
         self.history_max_tokens = config_data.get("history_max_tokens", 8192)
         self.chat_template_overhead = config_data.get("chat_template_overhead", 520)
         self.message_max_tokens = config_data.get("message_max_tokens", 30)
@@ -95,6 +98,7 @@ class Config:
         try:
             Validation.range("chat_temperature", config_data["chat_temperature"], (0.0, 2.0))
             Validation.range("chat_top_p", config_data["chat_top_p"], (0.0, 1.0))
+            Validation.range("chat_top_p", config_data["chat_top_k"], (0.0, 100))
         except RangeValidationError as  e:
             self._logger.error(e)
             raise e

@@ -38,6 +38,7 @@ class GGUF_LLM:
             messages=messages,
             temperature=self._config.chat_temperature,
             top_p=self._config.chat_top_p,
+            top_k=self._config.chat_top_k,
             max_tokens=self._config.chat_max_tokens,
         )
         return response["choices"][-1]["message"]["content"]
