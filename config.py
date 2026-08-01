@@ -24,7 +24,8 @@ class Config:
         "chat_top_k", 
         "history_max_tokens", 
         "chat_template_overhead", 
-        "message_max_tokens"
+        "message_max_tokens",
+        "night_mode"
     ]
     _CONFIG_TYPES = [
         str,
@@ -38,6 +39,7 @@ class Config:
         int,
         int,
         int,
+        bool
     ]
     
     def __init__(self, config_file='./data/config.json'):
@@ -56,6 +58,7 @@ class Config:
         self.history_max_tokens = config_data.get("history_max_tokens", 8192)
         self.chat_template_overhead = config_data.get("chat_template_overhead", 520)
         self.message_max_tokens = config_data.get("message_max_tokens", 30)
+        self.night_mode = config_data.get("night_mode", False)
 
     def _load_config(self, config_file):
         try: 

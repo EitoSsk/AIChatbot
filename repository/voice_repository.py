@@ -17,10 +17,14 @@ class VoiceRepository:
 
     def queryVoice(self, message: Response, voice_setting: dict):
         client = HttpClient(self._config, self._logger)
-        speaker = voice_setting.get(
-            message.emotion.name.lower(),
-            voice_setting["neutral"]
-        )
+        if self._config.night_mode:
+            speaker = voice_setting.get("whisper", voice_setting["neutral"])
+        else:
+            speaker = voice_setting.get(
+                message.emotion.name.lower(),
+                voice_setting["neutral"]
+            )
+        
         # クエリの取得
         try:
             query_res = client.request(

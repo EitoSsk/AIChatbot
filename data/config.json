@@ -9,5 +9,6 @@
     "chat_top_k": 64,
     "message_max_tokens": 8192,
     "chat_template_overhead": 520,
-    "history_max_tokens": 99999
+    "history_max_tokens": 99999,
+    "night_mode": false
 }

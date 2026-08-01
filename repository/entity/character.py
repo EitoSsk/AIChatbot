@@ -13,9 +13,9 @@ class Character:
 
     _CHARACTER_KEYS = ["name", "role", "sections"]
     _CHARACTER_SECTIONS_KEYS = ["title", "items"]
-    _VOICE_KEYS = ["neutral", "shy", "sad", "angry", "happy", "surprised", "excited"]
+    _VOICE_KEYS = ["neutral", "shy", "sad", "angry", "happy", "surprised", "excited", "whisper"]
     _VOICE_DEFAULT = {
-       "voice": { "neutral": 20, "shy": 66, "sad": 77, "angry": 78, "happy": 79, "surprised": 20, "excited": 20 },
+       "voice": { "neutral": 20, "shy": 66, "sad": 77, "angry": 78, "happy": 79, "surprised": 20, "excited": 20, "whisper": 19 },
     }
 
     # コンストラクタ
