@@ -55,9 +55,9 @@ class Config:
         self.chat_temperature = config_data.get("chat_temperature", 1.0)
         self.chat_top_p = config_data.get("chat_top_p", 0.95)
         self.chat_top_k = config_data.get("chat_top_k", 64)
-        self.history_max_tokens = config_data.get("history_max_tokens", 8192)
+        self.history_max_tokens = config_data.get("history_max_tokens", 99999)
         self.chat_template_overhead = config_data.get("chat_template_overhead", 520)
-        self.message_max_tokens = config_data.get("message_max_tokens", 30)
+        self.message_max_tokens = config_data.get("message_max_tokens", 8192)
         self.night_mode = config_data.get("night_mode", False)
 
     def _load_config(self, config_file):

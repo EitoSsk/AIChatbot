@@ -12,7 +12,7 @@ class GGUF_LLM:
     def load_model(self, model_id: str):
         self._model = Llama(
             model_path=model_id,
-            n_ctx=self._config.history_max_tokens,
+            n_ctx=self._config.message_max_tokens,
             # n_gpu_layers=-1,
             verbose=False
         )
@@ -55,12 +55,12 @@ class GGUF_LLM:
         for h in history:
             total_tokens += h["tokens"]
 
-        if total_tokens <= self._config.history_max_tokens:
+        if total_tokens <= self._config.message_max_tokens:
             return history.copy()
 
         trimed_history = history.copy()
-        while total_tokens > self._config.history_max_tokens and len(history) > 0:
-            removed = trimed_history[2:]
+        while total_tokens > self._config.message_max_tokens and len(history) > 0:
+            removed = trimed_history[:2]
             for r in removed:
                 total_tokens -= r["tokens"]
             
