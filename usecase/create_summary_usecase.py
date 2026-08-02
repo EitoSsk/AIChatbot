@@ -19,7 +19,7 @@ class CreateSummaryUseCase:
         self._summary_repository = summary_repository
         self._history_repository = history_repository
 
-    def execute(self, model):
+    def execute(self, model, is_new_month=False):
         # サマリ作成の実行判定
         history_tokens = self._history_repository.getAllHistoryTokens()
         prev_tokens = self._summary_repository.getLastHistoryTokens()
@@ -29,20 +29,21 @@ class CreateSummaryUseCase:
 history_tokens: {history_tokens}
 prev_tokens: {prev_tokens}
 diff: {diff}
+is_new_month: {is_new_month}
 """)
-        if diff > self._config.message_max_tokens:
-            self._logger.info("サマリを作成しています。しばらくお待ちください。")
-            self._summary_repository.createSummary(model, self._history_repository.getHistory(), history_tokens)
-            return False
-        elif diff < 0:
+        if is_new_month:
             self._logger.info("サマリを作成しています。しばらくお待ちください。")
             prev_datetime = datetime.now() - relativedelta(months=1)
             prev_month_history = self._getHistoryFromDate(model, prev_datetime)
             self._summary_repository.createSummary(model, prev_month_history, 0)
             return True
+        elif diff > self._config.message_max_tokens:
+            self._logger.info("サマリを作成しています。しばらくお待ちください。")
+            self._summary_repository.createSummary(model, self._history_repository.getHistory(), history_tokens)
+            return False
         else:
             return False
         
     def _getHistoryFromDate(self, model, date):
         history = self._history_repository.getHistoryFromDate(date)
-        return model.trim_history(history)
+        return model.trim_history("", history, [])

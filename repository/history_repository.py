@@ -21,7 +21,7 @@ class HistoryRepository:
         self._history.setHistory(history)
 
     def load_history(self):
-        self._history.load_history()
+        return self._history.load_history()
 
     def fetch_history(self, role, content, tokens, trimed_history: list):
         self._history.fetch_history(role, content, tokens, trimed_history)

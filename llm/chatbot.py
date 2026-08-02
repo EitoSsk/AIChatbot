@@ -67,9 +67,9 @@ class Chatbot:
     # チャットループを開始するメソッド
     def start_chat(self):
         # 履歴のロード
-        self._load_history_usecase.execute()
+        is_new_month = self._load_history_usecase.execute()
         # 要約・長期記憶を作成する
-        canCreateMemory = self._create_summary_usecase.execute(self._model)
+        canCreateMemory = self._create_summary_usecase.execute(self._model, is_new_month)
         # if canCreateMemory:
         #     self._create_memory_usecase.execute(self._model)
 

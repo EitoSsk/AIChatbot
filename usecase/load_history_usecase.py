@@ -40,7 +40,7 @@ class LoadHistoryUseCase:
         ).execute()
 
     def execute(self):
-        self._history_repository.load_history()
+        is_new_month = self._history_repository.load_history()
         all_history = self._history_repository.getAllHistory()
 
         trimed_history = self._model.trim_history(
@@ -50,3 +50,4 @@ class LoadHistoryUseCase:
         )
 
         self._history_repository.setHistory(trimed_history)
+        return is_new_month

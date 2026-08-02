@@ -53,9 +53,11 @@ class History:
     # history.jsonが存在しない場合は、新規作成される
     # メッセージの取得前に_discard_history()を呼び出して履歴を整理する
     # message_max_tokensの数だけ、直近のメッセージを取得する
-    def load_history(self):
+    def load_history(self) -> bool:
         if not os.path.exists(self._history_file):
-            self._create_new_history()
+            is_new_month = self._create_new_history()
+        else:
+            is_new_month = False
 
         try:
             self._discard_history()
@@ -64,6 +66,8 @@ class History:
         except (FileNotFoundError, PermissionError) as e:
             self._logger.error(e)
             raise HistoryError(FileErrorType.READ.value)
+
+        return is_new_month
 
     # 履歴にメッセージを追加し、最新の履歴を反映するメソッド
     # メッセージは辞書形式で、'role'と'content'、'timestamp'のキーを持つ
@@ -113,17 +117,20 @@ History Name: {self._history_file}
             file = history_files[-1]
             if not file.exists():
                 self._create_new_history_from_seed()
-                return
+                return False
                     
             try:
                 with file.open('r', encoding='utf-8') as f:
                     data = json.load(f)
                 with open(self._history_file, 'w', encoding='utf-8') as f:
-                    json.dump(data[-10:], f, ensure_ascii=False, indent=4)
+                    json.dump(data[-20:], f, ensure_ascii=False, indent=4)
+                return True
             except:
                 self._create_new_history_from_seed()
         else:
             self._create_new_history_from_seed()
+
+        return False
 
     def _create_new_history_from_seed(self):
         seed_file = Path(self._SEED_FILE)
