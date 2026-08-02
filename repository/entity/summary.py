@@ -25,13 +25,12 @@ class Summary:
 
     # サマリ作成
     # 応答を要約として保存する
-    def create(self, model, tokenizer, history, history_tokens):
-        prompt = history
+    def create(self, model, history, history_tokens):
         prev_summary = "なし"
         if not self._summary_data == {}:
             prev_summary = self._summary_data["summary"]
         
-        content = f"""これまでのユーザーとAIの会話の履歴を、今後の会話で利用するための要約にしてください。
+        system_prompt = f"""これまでのユーザーとAIの会話の履歴を、今後の会話で利用するための要約にしてください。
 ==============================================
 前回の要約
 {prev_summary}
@@ -77,10 +76,8 @@ class Summary:
 ・今回追加された新しい情報
 ==============================================
 """
-        message = {'role': "user", 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        prompt.append(message)
 
-        response = self._createSummary(model, tokenizer, prompt)
+        response = self._createSummary(model, "履歴の要約をしてください。", history, system_prompt)
         summary = {'summary': response, 'last_history_tokens': history_tokens, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self._createSummaryFile(summary)
         self._summary_data = summary
@@ -125,39 +122,16 @@ class Summary:
             raise SummaryError(FileErrorType.READ.value)
 
 
-    def _createSummary(self, model, tokenizer, prompt):
-        # トークナイズ
-        inputs = tokenizer.apply_chat_template(
-            prompt,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-            add_generation_prompt=True,
-        )
-        inputs = {k: v.to(model.device) for k, v in inputs.items()}
-
-        # 推論
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=self._config.chat_max_tokens,
-                temperature=self._config.chat_temperature,
-                top_p=self._config.chat_top_p,
-            )
-
+    def _createSummary(self, model, message, history, system_prompt):
         # 応答をデコード
-        response = tokenizer.decode(
-            outputs[0][inputs["input_ids"].shape[-1]:],
-            skip_special_tokens=True,
+        response = model.generate_response(
+            message=message,
+            prompt=history,
+            system=[system_prompt]
         )
 
         # トークン数をログ出力
-        response_tokens = tokenizer(
-            response,
-            return_tensors="pt",
-            add_special_tokens=False
-        )
-        response_tokens_count = response_tokens["input_ids"].shape[1]
+        response_tokens_count = model.count_tokens(response)
         self._logger.debug(
 f"""
 [Summary]

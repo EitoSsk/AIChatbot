@@ -20,8 +20,8 @@ class SummaryRepository:
         self._logger = logger
         self._summary = Summary(config, logger)
 
-    def createSummary(self, model, tokenizer, history, history_tokens):
-        self._summary.create(model, tokenizer, history, history_tokens)
+    def createSummary(self, model, history, history_tokens):
+        self._summary.create(model, history, history_tokens)
 
     def getLastHistoryTokens(self):
         return self._summary.getLastHistoryTokens()
