@@ -70,8 +70,8 @@ class Chatbot:
         is_new_month = self._load_history_usecase.execute()
         # 要約・長期記憶を作成する
         canCreateMemory = self._create_summary_usecase.execute(self._model, is_new_month)
-        # if canCreateMemory:
-        #     self._create_memory_usecase.execute(self._model)
+        if canCreateMemory:
+            self._create_memory_usecase.execute(self._model)
 
         # チャットを開始する
         self._chat_loop()
