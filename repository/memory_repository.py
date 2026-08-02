@@ -30,8 +30,8 @@ class MemoryRepository:
         self._logger = logger
         self._memory = Memory(config, logger)
 
-    def createMemory(self, model, tokenizer, summary):
-        self._memory.create(model, tokenizer, summary)
+    def createMemory(self, model, summary):
+        self._memory.create(model, summary)
 
     def build_prompt(self):
         memory = self._memory.getMemory()

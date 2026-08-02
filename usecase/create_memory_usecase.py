@@ -15,7 +15,7 @@ class CreateMemoryUseCase:
         self._summaryRepository = summaryRepository
         self._memoryRepository = memoryRepository
 
-    def execute(self, model, tokenizer):
+    def execute(self, model):
         summary = self._summaryRepository.getSummary()
         self._logger.info("メモリを作成しています。しばらくお待ちください。")
-        self._memoryRepository.createMemory(model, tokenizer, summary)
+        self._memoryRepository.createMemory(model, summary)

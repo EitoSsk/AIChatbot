@@ -7,7 +7,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
 import json
-import torch
 from core.data.exception.file_exception import SummaryError, FileErrorType
 
 class Summary:

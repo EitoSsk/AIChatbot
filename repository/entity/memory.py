@@ -6,7 +6,6 @@
 from datetime import datetime
 import os
 import json
-import torch
 from core.data.exception.file_exception import MemoryError, FileErrorType
 
 class Memory:
@@ -29,13 +28,12 @@ class Memory:
 
     # メモリ作成
     # 応答を長期記憶として保存する
-    def create(self, model, tokenizer, summary):
-        prompt = []
+    def create(self, model, summary):
         prev_memory = "なし"
         if not self._memory_data == {}:
             prev_memory = self._memory_data["memory"]
         
-        content = f"""あなたは長期記憶を更新するAIです。
+        system_prompt = f"""あなたは長期記憶を更新するAIです。
 
 以下には、
 
@@ -99,10 +97,8 @@ class Memory:
 AI自身の目標は記載しないでください。
 ==============================================
 """
-        message = {'role': "user", 'content': content, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        prompt.append(message)
 
-        response = self._createMemory(model, tokenizer, prompt)
+        response = self._createMemory(model, "長期記憶を作成sしてください。", system_prompt)
         memory = {'memory': response, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self._createMemoryFile(memory)
         self._memory_data = memory
@@ -121,30 +117,12 @@ AI自身の目標は記載しないでください。
             raise MemoryError(FileErrorType.READ.value)
 
 
-    def _createMemory(self, model, tokenizer, prompt):
-        # トークナイズ
-        inputs = tokenizer.apply_chat_template(
-            prompt,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-            add_generation_prompt=True,
-        )
-        inputs = {k: v.to(model.device) for k, v in inputs.items()}
-
-        # 推論
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=self._config.chat_max_tokens,
-                temperature=self._config.chat_temperature,
-                top_p=self._config.chat_top_p,
-            )
-
+    def _createMemory(self, model, message, system_prompt):
         # 応答をデコード
-        response = tokenizer.decode(
-            outputs[0][inputs["input_ids"].shape[-1]:],
-            skip_special_tokens=True,
+        response = model.generate_response(
+            message=message,
+            prompt=[],
+            system=[system_prompt]
         )
         return response
     
