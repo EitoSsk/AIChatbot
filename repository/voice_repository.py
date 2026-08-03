@@ -68,12 +68,12 @@ class VoiceRepository:
         elif message.emotion == Emotion.SURPRISED:
             query_json["speedScale"] = 1.20
             query_json["pitchScale"] = 0.10
-            query_json["intonationScale"] = 1.40
+            query_json["intonationScale"] = 1.20
             query_json["volumeScale"] = 1.05
         elif message.emotion == Emotion.EXCITED:
-            query_json["speedScale"] = 1.30
+            query_json["speedScale"] = 1.20
             query_json["pitchScale"] = 0.08
-            query_json["intonationScale"] = 1.55
+            query_json["intonationScale"] = 1.30
             query_json["volumeScale"] = 1.05
 
         self._logger.debug(f"""
