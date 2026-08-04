@@ -55,4 +55,14 @@ class TTS:
         except Exception as e:
             self._logger.error(e)
             self._logger.warning("音声の停止に失敗しました。")
+
+    def create_wav(self, plane_text: str, message: str, emotion, is_whisper: bool):
+        res = Response(
+            plane_text,
+            message,
+            emotion
+        )
+        voice_setting = self._character_repository.get_voice()
+        return self._voice_repository.queryVoice(res, voice_setting, is_whisper)
+                
         

@@ -15,9 +15,9 @@ class VoiceRepository:
         self._config = config
         self._logger = logger
 
-    def queryVoice(self, message: Response, voice_setting: dict):
+    def queryVoice(self, message: Response, voice_setting: dict, is_whisper: bool = False):
         client = HttpClient(self._config, self._logger)
-        if self._config.night_mode:
+        if self._config.night_mode or is_whisper:
             speaker = voice_setting.get("whisper", voice_setting["neutral"])
         else:
             speaker = voice_setting.get(

@@ -72,6 +72,8 @@ body{
 
     background:white;
 
+    margin-bottom: 20px;
+
 }
 
 #message{
@@ -125,12 +127,12 @@ button:active{
         type="text"
         placeholder="メッセージを入力">
 
-    <button onclick="sendMessage()">
-        送信
+    <button id="whisper" onclick="change_whisper()">
+        囁き
     </button>
 
-    <button onclick="load()">
-        更新
+    <button onclick="sendMessage()">
+        送信
     </button>
 
 </div>
