@@ -9,3 +9,5 @@ requests
 sounddevice
 numpy
 llama-cpp-python
+fastapi
+uvicorn
