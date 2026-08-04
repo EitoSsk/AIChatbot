@@ -68,5 +68,13 @@ class GGUF_LLM:
 
         return trimed_history
 
+    def trim_history_force(self, history: list):
+        if not len(history) > 0:
+            return history.copy()
+        
+        trimed_history = history.copy()
+        del trimed_history[:2]
+        return trimed_history
+
     def count_tokens(self, message: str):
         return len(self._model.tokenize(message.encode("utf-8")))

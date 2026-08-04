@@ -81,10 +81,8 @@ class Chat:
                 if count > 1:
                     self._logger.error(e)
                     raise e
-                trimed_history = self._model.trim_history(
-                    message, 
-                    trimed_history.copy(), 
-                    self._system_prompt_list
+                trimed_history = self._model.trim_history_force(
+                    trimed_history.copy()
                 )
 
         # 履歴の更新
