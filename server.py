@@ -1,3 +1,5 @@
+from core.data.emotion import Emotion
+from fastapi.responses import Response
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -8,6 +10,7 @@ from repository.character_repository import CharacterRepository
 from repository.history_repository import HistoryRepository
 from repository.memory_repository import MemoryRepository
 from repository.summary_repository import SummaryRepository
+from speech.tts import TTS
 from usecase.create_memory_usecase import CreateMemoryUseCase
 from usecase.create_summary_usecase import CreateSummaryUseCase
 from usecase.load_history_usecase import LoadHistoryUseCase
@@ -16,6 +19,11 @@ from config import Config
 
 class ChatRequest(BaseModel):
     message: str
+
+class VoiceRequest(BaseModel):
+    message: str
+    emotion: str
+    is_whisper: bool
 
 config = None
 logger = None
@@ -29,6 +37,7 @@ load_history_usecase = None
 create_summary_usecase = None
 create_memory_usecase = None
 chat_api = None
+tts = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,6 +54,7 @@ async def lifespan(app: FastAPI):
     global create_summary_usecase
     global create_memory_usecase
     global chat_api
+    global tts
 
     print("Loading model...")
 
@@ -86,6 +96,11 @@ async def lifespan(app: FastAPI):
         config, 
         logger
     )
+    tts = TTS(
+        config,
+        logger,
+        character_repository
+    )
     # 履歴のロード
     is_new_month = load_history_usecase.execute()
     # 要約・長期記憶を作成する
@@ -111,12 +126,22 @@ async def chat(request: ChatRequest):
     response = chat_api.send_message(request.message)
 
     return {
-        "reply": response.message
+        "reply": response.message,
+        "emotion": response.emotion.name,
     }
 
 @app.get("/get_history")
 async def get_history():
     history = history_repository.getHistory()
     return history
+
+@app.post("/tts")
+async def voice(request: VoiceRequest):
+    emotion = Emotion.from_string(request.emotion)
+    wav_data = tts.create_wav(request.message, request.message, emotion, request.is_whisper)
+    return Response(
+        content=wav_data,
+        media_type="audio/wav"
+    )
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
