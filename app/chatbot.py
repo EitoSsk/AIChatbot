@@ -5,7 +5,7 @@
 
 from core.data.exception.validation_exception import ResponseEmptyError
 from core.llm.gguf_llm import GGUF_LLM
-from llm.chat import Chat
+from app.chat import Chat
 from repository.character_repository import CharacterRepository
 from speech.tts import TTS
 from repository.history_repository import HistoryRepository

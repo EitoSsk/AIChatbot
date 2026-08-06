@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from core.llm.gguf_llm import GGUF_LLM
-from llm.chat import Chat
+from app.chat import Chat
 from repository.character_repository import CharacterRepository
 from repository.history_repository import HistoryRepository
 from repository.memory_repository import MemoryRepository
@@ -144,4 +144,4 @@ async def voice(request: VoiceRequest):
         media_type="audio/wav"
     )
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory="app/static", html=True), name="static")

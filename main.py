@@ -3,7 +3,7 @@
 from core.data.exception.application_exception import ApplicationException
 from logger import Logger
 from config import Config
-from llm.chatbot import Chatbot
+from app.chatbot import Chatbot
 
 if __name__ == "__main__":
     e = None
