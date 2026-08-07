@@ -280,7 +280,15 @@ GGUFはCPUでも動作し高速なチャットができている。
 # 実行方法
 
 1. python3のインストール
-https://www.python.org/downloads/
+
+動作環境 python3.10.6
+
+- Windowsの場合
+https://www.python.org/downloads/release/python-3106/?utm_source=chatgpt.com
+
+- Macの場合（install.shでインストールされる）
+brew install pyenv
+pyenv install 3.10.6
 
 2. VOICEVOXのインストール
 https://voicevox.hiroshiba.jp/
@@ -288,8 +296,11 @@ https://voicevox.hiroshiba.jp/
 APIのドキュメントはVOICEVOXを起動中に下記を開く
 http://127.0.0.1:50021/docs
 
-3. install.batの実行
+3. install.bat, install.shの実行
 必要なpythonモジュールのインストールを行う。
 
-4. start_chat.bat
+cd /AIChatbot
+cd sh ./install.sh
+
+4. start_chat.bat, start_chat.shの実行
 チャットが起動される。
