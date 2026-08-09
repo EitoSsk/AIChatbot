@@ -1,6 +1,7 @@
 __pycache__
 /data/history/
 /data/summary/
+/data/cache/
 /data/memory.json
 /model/
 /data/knowledge/

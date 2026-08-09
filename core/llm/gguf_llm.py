@@ -1,13 +1,18 @@
 
+import os
 from config import Config
 from llama_cpp import Llama
+import pickle
 
 class GGUF_LLM:
 
     def __init__(self, model_id, config: Config, logger):
         self._config = config
         self._logger = logger
+        self._cache_file_dir = "./data/cache/"
+        self._cache_file = "./data/cache/chat_state.bin"
         self.load_model(model_id)
+        
 
     def load_model(self, model_id: str):
         self._model = Llama(
@@ -16,6 +21,10 @@ class GGUF_LLM:
             # n_gpu_layers=-1,
             verbose=False
         )
+        if os.path.exists(self._cache_file):
+            with open(self._cache_file, "rb") as f:
+                state = pickle.load(f)
+                self._model.load_state(state)
         
     def generate_response(self, message: str, prompt: list, system: list):
         system_message = "\n".join(system)
@@ -78,3 +87,10 @@ class GGUF_LLM:
 
     def count_tokens(self, message: str):
         return len(self._model.tokenize(message.encode("utf-8")))
+    
+    def save_cache(self):
+        state = self._model.save_state()
+        if not os.path.exists(self._cache_file_dir):
+            os.makedirs(self._cache_file_dir, exist_ok=True)
+        with open(self._cache_file, "wb") as f:
+            pickle.dump(state, f)

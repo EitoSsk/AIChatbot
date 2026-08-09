@@ -111,6 +111,8 @@ async def lifespan(app: FastAPI):
     print("Model loaded")
 
     yield
+    
+    model.save_cache()
 
     print("Shutdown")
 

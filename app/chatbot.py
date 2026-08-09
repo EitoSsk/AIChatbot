@@ -112,3 +112,4 @@ class Chatbot:
     # チャットの終了処理
     def _close_chat(self):
         print("チャットを終了します。")
+        self._model.save_cache()
